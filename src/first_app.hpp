@@ -4,6 +4,7 @@
 
 #pragma once
 #include "window.hpp"
+#include "pipeline.h"
 
 
 namespace te {
@@ -14,7 +15,8 @@ namespace te {
 
         void run();
     private:
-        Window window = Window(WIDTH, HEIGHT, "Hello Vulkan");
+        Window window{WIDTH, HEIGHT, "Test"};
+        Pipeline pipeline{"../src/shaders/simple_shader.vert.spv", "../src/shaders/simple_shader.frag.spv"};
     };
 }
 
