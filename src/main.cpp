@@ -1,6 +1,17 @@
-#include "Engine3D.hpp"
+#include "first_app.hpp"
 
-int main(int argc, char* argv[]) {
-    GEngine::Engine3D::GetInstance().Start();
-    return 0;
+#include <cstdlib>
+#include <iostream>
+#include <stdexcept>
+
+int main() {
+    te::FirstApp app = te::FirstApp();
+
+    try {
+        app.run();
+    }catch (const std::exception &e) {
+        std::cerr << e.what() << "\n";
+        return EXIT_FAILURE;
+    }
+    return EXIT_SUCCESS;
 }

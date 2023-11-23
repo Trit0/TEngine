@@ -1,1 +1,5 @@
 /build
+/libs
+/cmake-build-debug
+
+CMakeUserPresets.json

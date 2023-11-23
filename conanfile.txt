@@ -1,0 +1,14 @@
+[requires]
+glfw/3.3.8
+glm/cci.20230113
+
+[tool_requires]
+cmake/3.27.7
+
+[imports]
+include, *.h -> ./include
+include, *.hpp -> ./include
+
+[generators]
+CMakeDeps
+CMakeToolchain
