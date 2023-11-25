@@ -16,7 +16,8 @@ namespace te {
         void run();
     private:
         Window window{WIDTH, HEIGHT, "Test"};
-        Pipeline pipeline{"../src/shaders/simple_shader.vert.spv", "../src/shaders/simple_shader.frag.spv"};
+        Device device{window};
+        Pipeline pipeline{device, "../src/shaders/simple_shader.vert.spv", "../src/shaders/simple_shader.frag.spv", Pipeline::defaultPipelineConfigInfo(WIDTH, HEIGHT)};
     };
 }
 

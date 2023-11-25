@@ -6,7 +6,9 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
 set(SOURCE_FILES src/main.cpp src/window.hpp src/window.cpp src/first_app.cpp src/first_app.hpp src/pipeline.h
         src/pipeline.h
-        src/pipeline.cpp)
+        src/pipeline.cpp
+        src/device.hpp
+        src/device.cpp)
 
 find_package(GLFW3 REQUIRED)
 find_package(GLM REQUIRED)

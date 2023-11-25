@@ -1,6 +1,7 @@
 //
 // Created by Tristan Brault on 2023-11-22.
 //
+#include <stdexcept>
 #include "window.hpp"
 
 namespace te {
@@ -21,5 +22,9 @@ namespace te {
         window = glfwCreateWindow(width, height, windowName.c_str(), nullptr, nullptr);
     }
 
-
+    void Window::createWindowSurface(VkInstance instance, VkSurfaceKHR *surface) {
+        if (glfwCreateWindowSurface(instance, window, nullptr, surface) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create window surface");
+        }
+    }
 }
