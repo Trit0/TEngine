@@ -6,6 +6,7 @@
 #include "window.hpp"
 #include "pipeline.h"
 #include "swap_chain.hpp"
+#include "model.h"
 
 #include <memory>
 #include <vector>
@@ -25,10 +26,12 @@ namespace te {
 
         void run();
     private:
+        void loadModel();
         void createPipelineLayout();
         void createPipeline();
         void createCommandBuffers();
         void drawFrame();
+        void sierpinski(std::vector<Model::Vertex> &vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top);
 
 
         Window window{WIDTH, HEIGHT, "Test"};
@@ -37,6 +40,7 @@ namespace te {
         std::unique_ptr<Pipeline> pipeline;
         VkPipelineLayout pipelineLayout;
         std::vector<VkCommandBuffer> commandBuffers;
+        std::unique_ptr<Model> model;
      };
 }
 

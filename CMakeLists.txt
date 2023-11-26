@@ -10,7 +10,9 @@ set(SOURCE_FILES src/main.cpp src/window.hpp src/window.cpp src/first_app.cpp sr
         src/device.hpp
         src/device.cpp
         src/swap_chain.hpp
-        src/swap_chain.cpp)
+        src/swap_chain.cpp
+        src/model.cpp
+        src/model.h)
 
 set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders)
 
