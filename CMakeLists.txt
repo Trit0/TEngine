@@ -49,4 +49,4 @@ compile_shader(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} glfw glm::glm Vulkan::Vulkan)
-target_include_directories(${PROJECT_NAME} PUBLIC ${glfw3_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${glfw3_INCLUDE_DIRS} PUBLIC ${glm_INCLUDE_DIRS})
