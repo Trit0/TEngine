@@ -10,7 +10,7 @@
 
 namespace te {
     struct PipelineConfigInfo {
-        // TODO look why its crashing the world
+        // TODO look why its crashing the world on resize
         // PipelineConfigInfo(const PipelineConfigInfo&) = delete;
         PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 

@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 #include "window.hpp"
 #include "pipeline.h"
 #include "swap_chain.hpp"
