@@ -5,9 +5,8 @@
 #pragma once
 
 #include "window.hpp"
-#include "pipeline.h"
-#include "swap_chain.hpp"
-#include "game_object.h"
+#include "game_object.hpp"
+#include "renderer.hpp"
 
 #include <memory>
 #include <vector>
@@ -28,23 +27,13 @@ namespace te {
         void run();
     private:
         void loadGameObjects();
-        void createPipelineLayout();
-        void createPipeline();
-        void createCommandBuffers();
-        void freeCommandBuffers();
-        void drawFrame();
-        void recreateSwapChain();
-        void recordCommandBuffer(int imageIndex);
-        void renderGameObjects(VkCommandBuffer commandBuffer);
         void sierpinski(std::vector<Model::Vertex> &vertices, int depth, glm::vec2 left, glm::vec2 right, glm::vec2 top);
 
 
         Window window{WIDTH, HEIGHT, "Vulkan Test"};
         Device device{window};
-        std::unique_ptr<SwapChain> swapChain;
-        std::unique_ptr<Pipeline> pipeline;
-        VkPipelineLayout pipelineLayout;
-        std::vector<VkCommandBuffer> commandBuffers;
+        Renderer renderer{window, device};
+
         std::vector<GameObject> gameObjects;
      };
 }

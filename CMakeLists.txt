@@ -4,16 +4,20 @@ project(TEngine)
 set(CMAKE_TOOLCHAIN_FILE include/conan_toolchain.cmake)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
-set(SOURCE_FILES src/main.cpp src/window.hpp src/window.cpp src/first_app.cpp src/first_app.hpp src/pipeline.h
-        src/pipeline.h
+set(SOURCE_FILES src/main.cpp src/window.hpp src/window.cpp src/first_app.cpp src/first_app.hpp src/pipeline.hpp
+        src/pipeline.hpp
         src/pipeline.cpp
         src/device.hpp
         src/device.cpp
         src/swap_chain.hpp
         src/swap_chain.cpp
         src/model.cpp
-        src/model.h
-        src/game_object.h)
+        src/model.hpp
+        src/game_object.hpp
+        src/renderer.cpp
+        src/renderer.hpp
+        src/simple_render_system.cpp
+        src/simple_render_system.hpp)
 
 set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders)
 

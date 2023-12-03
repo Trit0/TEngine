@@ -2,8 +2,8 @@
 // Created by Tristan Brault on 2023-11-23.
 //
 
-#include "pipeline.h"
-#include "model.h"
+#include "pipeline.hpp"
+#include "model.hpp"
 
 #include <fstream>
 #include <stdexcept>

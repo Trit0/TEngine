@@ -2,7 +2,7 @@
 // Created by Trist on 2023-11-26.
 //
 
-#include "model.h"
+#include "model.hpp"
 
 #include <cassert>
 
