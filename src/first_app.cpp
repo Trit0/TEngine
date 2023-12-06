@@ -50,11 +50,18 @@ namespace te {
     }
 
     void FirstApp::loadGameObjects() {
-        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../src/models/smooth_vase.obj");
+        std::shared_ptr<Model> flatVaseModel = Model::createModelFromFile(device, "../src/models/flat_vase.obj");
         auto gameObj = GameObject::createGameObject();
-        gameObj.model = model;
-        gameObj.transform.translation = {.0f, .0f, 2.5f};
-        gameObj.transform.scale = glm::vec3{3.0f};
+        gameObj.model = flatVaseModel;
+        gameObj.transform.translation = {0.5f, .5f, 2.5f};
+        gameObj.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
         gameObjects.push_back(std::move(gameObj));
+
+        std::shared_ptr<Model> smoothVaseModel = Model::createModelFromFile(device, "../src/models/smooth_vase.obj");
+        auto gameObj2 = GameObject::createGameObject();
+        gameObj2.model = smoothVaseModel;
+        gameObj2.transform.translation = {-0.5f, .5f, 2.5f};
+        gameObj2.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
+        gameObjects.push_back(std::move(gameObj2));
     }
 } // namespace

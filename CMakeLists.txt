@@ -22,7 +22,8 @@ set(SOURCE_FILES src/main.cpp src/window.hpp src/window.cpp src/first_app.cpp sr
         src/camera.hpp
         src/keyboard_movement_controller.cpp
         src/keyboard_movement_controller.hpp
-        src/utils.hpp)
+        src/utils.hpp
+        src/game_object.cpp)
 
 set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders)
 
