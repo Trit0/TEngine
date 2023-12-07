@@ -3,16 +3,34 @@
 #include "camera.hpp"
 #include "simple_render_system.hpp"
 #include "keyboard_movement_controller.hpp"
+#include "buffer.hpp"
 
 #include <chrono>
 
 namespace te {
+
+    struct GlobalUbo {
+        glm::mat4 projectionView{1.f};
+        glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+    };
+
     FirstApp::FirstApp() { loadGameObjects(); }
 
     FirstApp::~FirstApp() {
     }
 
     void FirstApp::run() {
+        std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < uboBuffers.size(); i++) {
+            uboBuffers[i] = std::make_unique<Buffer>(device,
+            sizeof(GlobalUbo),
+            1,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+
+            uboBuffers[i]->map();
+        }
+
         SimpleRenderSystem simpleRenderSystem{device, renderer.getSwapChainRenderPass()};
         Camera camera{};
         // camera.setViewDirection(glm::vec3{0.f}, glm::vec3{.5f, 0.f, 1.f});
@@ -38,9 +56,18 @@ namespace te {
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 10.f);
 
             if (auto commandBuffer = renderer.beginFrame()) {
-                // render system
+                int frameIndex = renderer.getFrameIndex();
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera};
+
+                //update
+                GlobalUbo ubo{};
+                ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
+                uboBuffers[frameIndex]->writeToBuffer(&ubo, frameIndex);
+                uboBuffers[frameIndex]->flushIndex(frameIndex);
+
+                // render
                 renderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(commandBuffer, gameObjects, camera);
+                simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
                 renderer.endSwapChainRenderPass(commandBuffer);
                 renderer.endFrame();
             }
@@ -50,11 +77,11 @@ namespace te {
     }
 
     void FirstApp::loadGameObjects() {
-        std::shared_ptr<Model> flatVaseModel = Model::createModelFromFile(device, "../src/models/flat_vase.obj");
+        std::shared_ptr<Model> flatVaseModel = Model::createModelFromFile(device, "../src/models/colored_cube.obj");
         auto gameObj = GameObject::createGameObject();
         gameObj.model = flatVaseModel;
-        gameObj.transform.translation = {0.5f, .5f, 2.5f};
-        gameObj.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
+        gameObj.transform.translation = {1.0f, 0.f, 2.5f};
+        gameObj.transform.scale = glm::vec3{0.5f, 0.5f, 0.5f};
         gameObjects.push_back(std::move(gameObj));
 
         std::shared_ptr<Model> smoothVaseModel = Model::createModelFromFile(device, "../src/models/smooth_vase.obj");

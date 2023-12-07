@@ -1,8 +1,10 @@
 //
 // Created by Tristan Brault on 2023-11-22.
 //
-#include <stdexcept>
+
 #include "window.hpp"
+
+#include <stdexcept>
 
 namespace te {
     Window::Window(const int w, int h, std::string name): width(w), height(h), windowName(name) {
