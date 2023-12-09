@@ -7,6 +7,7 @@
 #include "window.hpp"
 #include "game_object.hpp"
 #include "renderer.hpp"
+#include "descriptors.hpp"
 
 #include <memory>
 #include <vector>
@@ -33,6 +34,7 @@ namespace te {
         Device device{window};
         Renderer renderer{window, device};
 
+        std::unique_ptr<DescriptorPool> globalPool{};
         std::vector<GameObject> gameObjects;
      };
 }

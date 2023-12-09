@@ -14,7 +14,14 @@ namespace te {
         glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
     };
 
-    FirstApp::FirstApp() { loadGameObjects(); }
+    FirstApp::FirstApp() {
+        globalPool = DescriptorPool::Builder(device)
+        .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+        .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+        .build();
+
+        loadGameObjects();
+    }
 
     FirstApp::~FirstApp() {
     }
@@ -31,7 +38,23 @@ namespace te {
             uboBuffers[i]->map();
         }
 
-        SimpleRenderSystem simpleRenderSystem{device, renderer.getSwapChainRenderPass()};
+        auto globalSetLayout =
+        DescriptorSetLayout::Builder(device)
+          .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+          .build();
+
+        std::vector<VkDescriptorSet> globalDescriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
+        for (int i = 0; i < globalDescriptorSets.size(); i++) {
+            auto bufferInfo = uboBuffers[i]->descriptorInfo();
+            DescriptorWriter(*globalSetLayout, *globalPool)
+                .writeBuffer(0, &bufferInfo)
+                .build(globalDescriptorSets[i]);
+        }
+
+        SimpleRenderSystem simpleRenderSystem{
+            device,
+            renderer.getSwapChainRenderPass(),
+            globalSetLayout->getDescriptorSetLayout()};
         Camera camera{};
         // camera.setViewDirection(glm::vec3{0.f}, glm::vec3{.5f, 0.f, 1.f});
         camera.setViewTarget(glm::vec3{-1.f, -2.f, 2.f}, glm::vec3{0.f, 0.f, 2.5f});
@@ -57,7 +80,7 @@ namespace te {
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera};
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex]};
 
                 //update
                 GlobalUbo ubo{};
