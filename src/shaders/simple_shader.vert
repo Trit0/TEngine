@@ -7,7 +7,7 @@ layout(location = 3) in vec3 uv;
 
 layout(location = 0) out vec3 fragColor;
 
-layout(set=0, binding=0) uniform GlobalUbo {
+layout(set = 0, binding = 0) uniform GlobalUbo {
     mat4 projectionViewMatrix;
     vec3 directionToLight;
 } ubo;
@@ -17,7 +17,6 @@ layout(push_constant) uniform Push {
     mat4 normalMatrix;
 } push;
 
-const vec3 DIRECTION_TO_LIGHT = normalize(vec3(1.0, -3.0, -1.0));
 const float AMBIENT = 0.02;
 
 void main() {

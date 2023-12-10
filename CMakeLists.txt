@@ -27,8 +27,8 @@ set(SOURCE_FILES src/main.cpp src/window.hpp src/window.cpp src/first_app.cpp sr
         src/buffer.cpp
         src/buffer.hpp
         src/frame_info.hpp
-        src/descriptors.hpp
-        src/descriptors.cpp)
+        src/descriptors.cpp
+        src/descriptors.hpp)
 
 set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders)
 
