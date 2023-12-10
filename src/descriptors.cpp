@@ -4,6 +4,8 @@
 
 #include "descriptors.hpp"
 
+#include <cassert>
+
 namespace te {
     // *************** Descriptor Set Layout Builder *********************
 
