@@ -42,7 +42,7 @@ namespace te {
 
         auto globalSetLayout =
         DescriptorSetLayout::Builder(device)
-          .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+          .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_ALL_GRAPHICS)
           .build();
 
         std::vector<VkDescriptorSet> globalDescriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -83,7 +83,7 @@ namespace te {
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex]};
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects};
 
                 //update
                 GlobalUbo ubo{};
@@ -93,7 +93,7 @@ namespace te {
 
                 // render
                 renderer.beginSwapChainRenderPass(commandBuffer);
-                simpleRenderSystem.renderGameObjects(frameInfo, gameObjects);
+                simpleRenderSystem.renderGameObjects(frameInfo);
                 renderer.endSwapChainRenderPass(commandBuffer);
                 renderer.endFrame();
             }
@@ -104,24 +104,24 @@ namespace te {
 
     void FirstApp::loadGameObjects() {
         std::shared_ptr<Model> model = Model::createModelFromFile(device, "../src/models/flat_vase.obj");
-        auto gameObj = GameObject::createGameObject();
-        gameObj.model = model;
-        gameObj.transform.translation = {1.0f, 0.5f, 0.f};
-        gameObj.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
-        gameObjects.push_back(std::move(gameObj));
+        auto flatVase = GameObject::createGameObject();
+        flatVase.model = model;
+        flatVase.transform.translation = {1.0f, 0.5f, 0.f};
+        flatVase.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
+        gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
         model = Model::createModelFromFile(device, "../src/models/smooth_vase.obj");
-        auto gameObj2 = GameObject::createGameObject();
-        gameObj2.model = model;
-        gameObj2.transform.translation = {-0.5f, .5f, 0.f};
-        gameObj2.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
-        gameObjects.push_back(std::move(gameObj2));
+        auto smoothVase = GameObject::createGameObject();
+        smoothVase.model = model;
+        smoothVase.transform.translation = {-0.5f, .5f, 0.f};
+        smoothVase.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
+        gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
         model = Model::createModelFromFile(device, "../src/models/quad.obj");
         auto floor = GameObject::createGameObject();
         floor.model = model;
         floor.transform.translation = {0.f, .5f, 0.f};
         floor.transform.scale = glm::vec3{3.0f, 1.f, 3.0f};
-        gameObjects.push_back(std::move(floor));
+        gameObjects.emplace(floor.getId(), std::move(floor));
     }
 } // namespace
