@@ -2,35 +2,13 @@ cmake_minimum_required(VERSION 3.26)
 project(TEngine)
 
 set(CMAKE_TOOLCHAIN_FILE include/conan_toolchain.cmake)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
-set(SOURCE_FILES src/main.cpp src/window.hpp src/window.cpp src/first_app.cpp src/first_app.hpp src/pipeline.hpp
-        src/pipeline.hpp
-        src/pipeline.cpp
-        src/device.hpp
-        src/device.cpp
-        src/swap_chain.hpp
-        src/swap_chain.cpp
-        src/model.cpp
-        src/model.hpp
-        src/game_object.hpp
-        src/renderer.cpp
-        src/renderer.hpp
-        src/simple_render_system.cpp
-        src/simple_render_system.hpp
-        src/camera.cpp
-        src/camera.hpp
-        src/keyboard_movement_controller.cpp
-        src/keyboard_movement_controller.hpp
-        src/utils.hpp
-        src/game_object.cpp
-        src/buffer.cpp
-        src/buffer.hpp
-        src/frame_info.hpp
-        src/descriptors.cpp
-        src/descriptors.hpp)
 
-set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src/shaders)
+file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+
+set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 
 find_package(GLFW3 REQUIRED)
 find_package(GLM REQUIRED)
@@ -56,7 +34,7 @@ endfunction()
 
 message("Building with CMake version: ${CMAKE_VERSION}")
 
-add_executable(${PROJECT_NAME} ${SOURCE_FILES})
+add_executable(${PROJECT_NAME} ${SOURCES})
 
 compile_shader(${PROJECT_NAME}
         FORMAT spv
@@ -66,4 +44,4 @@ compile_shader(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} glfw glm::glm Vulkan::Vulkan tinyobjloader::tinyobjloader)
-target_include_directories(${PROJECT_NAME} PUBLIC ${glfw3_INCLUDE_DIRS} PUBLIC ${glm_INCLUDE_DIRS} PUBLIC ${tinyobjloader_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src ${glfw3_INCLUDE_DIRS} ${glm_INCLUDE_DIRS} ${tinyobjloader_INCLUDE_DIRS})

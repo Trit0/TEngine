@@ -103,21 +103,21 @@ namespace te {
     }
 
     void FirstApp::loadGameObjects() {
-        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../src/models/flat_vase.obj");
+        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/flat_vase.obj");
         auto flatVase = GameObject::createGameObject();
         flatVase.model = model;
         flatVase.transform.translation = {1.0f, 0.5f, 0.f};
         flatVase.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
         gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
-        model = Model::createModelFromFile(device, "../src/models/smooth_vase.obj");
+        model = Model::createModelFromFile(device, "../models/smooth_vase.obj");
         auto smoothVase = GameObject::createGameObject();
         smoothVase.model = model;
         smoothVase.transform.translation = {-0.5f, .5f, 0.f};
         smoothVase.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
         gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
-        model = Model::createModelFromFile(device, "../src/models/quad.obj");
+        model = Model::createModelFromFile(device, "../models/quad.obj");
         auto floor = GameObject::createGameObject();
         floor.model = model;
         floor.transform.translation = {0.f, .5f, 0.f};
