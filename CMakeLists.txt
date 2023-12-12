@@ -6,9 +6,10 @@ set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
 
-file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
-
 set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
+
+file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+file(GLOB SHADER_FILES ${SHADERS_DIR}/*.frag ${SHADERS_DIR}/*.vert)
 
 find_package(GLFW3 REQUIRED)
 find_package(GLM REQUIRED)
@@ -39,8 +40,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 compile_shader(${PROJECT_NAME}
         FORMAT spv
         SOURCES
-        ${SHADERS_DIR}/simple_shader.vert
-        ${SHADERS_DIR}/simple_shader.frag
+        ${SHADER_FILES}
 )
 
 target_link_libraries(${PROJECT_NAME} glfw glm::glm Vulkan::Vulkan tinyobjloader::tinyobjloader)

@@ -1,2 +1,8 @@
-glslc shaders/simple_shader.vert -o shaders/simple_shader.vert.spv
-glslc shaders/simple_shader.frag -o shaders/simple_shader.frag.spv
+shader=(`find . -type f -name \*.vert -o -name \*.frag`)
+index=0
+
+for i in "${shader[@]}"; do
+    echo "Compiling $i.spv"
+    glslc "$i" -o "$i.spv"
+    index=$((index+1))
+done

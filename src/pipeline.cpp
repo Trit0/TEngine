@@ -65,8 +65,8 @@ namespace te {
         shaderStages[1].pNext = nullptr;
         shaderStages[1].pSpecializationInfo = nullptr;
 
-        auto bindingDescriptions = Model::Vertex::getBindingDescriptions();
-        auto attributesDescriptions = Model::Vertex::getAttributeDescriptions();
+        auto& bindingDescriptions = configInfo.bindingDescription;
+        auto& attributesDescriptions = configInfo.attributeDescription;
         VkPipelineVertexInputStateCreateInfo vertexInputInfo{};
         vertexInputInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
         vertexInputInfo.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributesDescriptions.size());
@@ -183,5 +183,8 @@ namespace te {
         configInfo.dynamicStateInfo.pDynamicStates = configInfo.dynamicStateEnables.data();
         configInfo.dynamicStateInfo.dynamicStateCount = static_cast<uint32_t>(configInfo.dynamicStateEnables.size());
         configInfo.dynamicStateInfo.flags = 0;
+
+        configInfo.bindingDescription = Model::Vertex::getBindingDescriptions();
+        configInfo.attributeDescription = Model::Vertex::getAttributeDescriptions();
     }
 }

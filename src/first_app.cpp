@@ -1,7 +1,8 @@
 #include "first_app.hpp"
 
 #include "camera.hpp"
-#include "simple_render_system.hpp"
+#include "systems/simple_render_system.hpp"
+#include "systems/point_light_system.hpp"
 #include "keyboard_movement_controller.hpp"
 #include "buffer.hpp"
 
@@ -10,7 +11,8 @@
 namespace te {
 
     struct GlobalUbo {
-        glm::mat4 projectionView{1.f};
+        glm::mat4 projection{1.f};
+        glm::mat4 view{1.f};
         glm::vec4 ambientLightColor{1.f, 1.f, 1.f, 0.02f};
         glm::vec3 lightPosition{-1.f};
         alignas(16) glm::vec4 lightColor{1.f};
@@ -57,6 +59,12 @@ namespace te {
             device,
             renderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout()};
+
+        PointLightSystem pointLightSystem{
+            device,
+            renderer.getSwapChainRenderPass(),
+            globalSetLayout->getDescriptorSetLayout()};
+
         Camera camera{};
         // camera.setViewDirection(glm::vec3{0.f}, glm::vec3{.5f, 0.f, 1.f});
         camera.setViewTarget(glm::vec3{-1.f, -2.f, 2.f}, glm::vec3{0.f, 0.f, 2.5f});
@@ -87,13 +95,15 @@ namespace te {
 
                 //update
                 GlobalUbo ubo{};
-                ubo.projectionView = camera.getProjectionMatrix() * camera.getViewMatrix();
+                ubo.projection = camera.getProjectionMatrix();
+                ubo.view = camera.getViewMatrix();
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
                 // render
                 renderer.beginSwapChainRenderPass(commandBuffer);
                 simpleRenderSystem.renderGameObjects(frameInfo);
+                pointLightSystem.render(frameInfo);
                 renderer.endSwapChainRenderPass(commandBuffer);
                 renderer.endFrame();
             }
