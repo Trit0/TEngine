@@ -88,6 +88,7 @@ namespace te {
                 GlobalUbo ubo{};
                 ubo.projection = camera.getProjectionMatrix();
                 ubo.view = camera.getViewMatrix();
+                ubo.inverseView = camera.getInverseViewMatrix();
                 pointLightSystem.update(frameInfo, ubo);
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
