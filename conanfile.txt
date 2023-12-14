@@ -1,0 +1,15 @@
+[requires]
+glfw/3.3.8
+glm/cci.20230113
+tinyobjloader/2.0.0-rc10
+
+[tool_requires]
+cmake/3.27.7
+
+[imports]
+include, *.h -> ./include
+include, *.hpp -> ./include
+
+[generators]
+CMakeDeps
+CMakeToolchain

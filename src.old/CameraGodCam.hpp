@@ -3,7 +3,7 @@
 
 #include <iostream>
 
-#include "Camera3d.hpp"
+#include "Camera3D.hpp"
 #include "EventContainer.hpp"
 #include "math/Matrix44D.hpp"
 #include "math/Vector3D.hpp"
