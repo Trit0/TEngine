@@ -10,8 +10,8 @@
 
 namespace te {
     struct PipelineConfigInfo {
-        // TODO look why its crashing the world on resize
-        // PipelineConfigInfo(const PipelineConfigInfo&) = delete;
+        PipelineConfigInfo() = default;
+        PipelineConfigInfo(const PipelineConfigInfo&) = delete;
         PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
         std::vector<VkVertexInputBindingDescription> bindingDescription{};
@@ -44,6 +44,7 @@ namespace te {
         void bind(VkCommandBuffer commandBuffer);
 
         static void defaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
+        static void enableAlphaBlending(PipelineConfigInfo& configInfo);
 
     private:
         static std::vector<char> readFile(const std::string &filePath);
