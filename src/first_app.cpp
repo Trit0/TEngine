@@ -5,8 +5,10 @@
 #include "systems/point_light_system.hpp"
 #include "keyboard_movement_controller.hpp"
 #include "buffer.hpp"
+#include "texture.hpp"
 
 #include <chrono>
+#include <iostream>
 
 namespace te {
     FirstApp::FirstApp() {
@@ -14,6 +16,17 @@ namespace te {
         .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
+
+        // build frame descriptor pools
+        framePools.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+        auto framePoolBuilder = DescriptorPool::Builder(device)
+                .setMaxSets(1000)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000)
+                .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT);
+        for (int i = 0; i < framePools.size(); i++) {
+            framePools[i] = framePoolBuilder.build();
+        }
 
         loadGameObjects();
     }
@@ -46,6 +59,9 @@ namespace te {
                 .build(globalDescriptorSets[i]);
         }
 
+        std::cout << "Alignment: " << device.properties.limits.minUniformBufferOffsetAlignment << "\n";
+        std::cout << "Atom size: " << device.properties.limits.nonCoherentAtomSize << "\n";
+
         SimpleRenderSystem simpleRenderSystem{
             device,
             renderer.getSwapChainRenderPass(),
@@ -60,7 +76,7 @@ namespace te {
         // camera.setViewDirection(glm::vec3{0.f}, glm::vec3{.5f, 0.f, 1.f});
         camera.setViewTarget(glm::vec3{-1.f, -2.f, 2.f}, glm::vec3{0.f, 0.f, 2.5f});
 
-        auto viewerObject = GameObject::createGameObject();
+        auto& viewerObject = gameObjectManager.createGameObject();
         viewerObject.transform.translation.z = -2.5f;
         KeyboardMovementController cameraController{};
 
@@ -82,7 +98,8 @@ namespace te {
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects};
+                framePools[frameIndex]->resetPool();
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], *framePools[frameIndex], gameObjectManager.gameObjects};
 
                 //update
                 GlobalUbo ubo{};
@@ -92,6 +109,10 @@ namespace te {
                 pointLightSystem.update(frameInfo, ubo);
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
+
+                // final step of update is updating the game objects buffer data
+                // The render functions MUST not change a game objects transform data
+                gameObjectManager.updateBuffer(frameIndex);
 
                 // render
                 renderer.beginSwapChainRenderPass(commandBuffer);
@@ -110,25 +131,24 @@ namespace te {
 
     void FirstApp::loadGameObjects() {
         std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/flat_vase.obj");
-        auto flatVase = GameObject::createGameObject();
+        auto& flatVase = gameObjectManager.createGameObject();
         flatVase.model = model;
         flatVase.transform.translation = {0.5f, 0.5f, 0.f};
         flatVase.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
-        gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
         model = Model::createModelFromFile(device, "../models/smooth_vase.obj");
-        auto smoothVase = GameObject::createGameObject();
+        auto& smoothVase = gameObjectManager.createGameObject();
         smoothVase.model = model;
         smoothVase.transform.translation = {-0.5f, .5f, 0.f};
         smoothVase.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
-        gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
         model = Model::createModelFromFile(device, "../models/quad.obj");
-        auto floor = GameObject::createGameObject();
+        std::shared_ptr<Texture> marbleTexture = Texture::createTextureFromFile(device, "../textures/missing.png");
+        auto& floor = gameObjectManager.createGameObject();
         floor.model = model;
+        floor.diffuseMap = marbleTexture;
         floor.transform.translation = {0.f, .5f, 0.f};
         floor.transform.scale = glm::vec3{3.0f, 1.f, 3.0f};
-        gameObjects.emplace(floor.getId(), std::move(floor));
 
         std::vector<glm::vec3> lightColors{
           {1.f, .1f, .1f},
@@ -140,11 +160,10 @@ namespace te {
         };
 
         for (int i = 0; i < lightColors.size(); i++) {
-            auto pointLight = GameObject::makePointLight(0.2f);
+            auto& pointLight = gameObjectManager.makePointLight(0.2f);
             pointLight.color = lightColors[i];
             auto rotateLight = glm::rotate(glm::mat4(1.f), (i * glm::two_pi<float>() / lightColors.size()), {0.f, -1.f, 0.f});
             pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
-            gameObjects.emplace(pointLight.getId(), std::move(pointLight));
         }
     }
 } // namespace

@@ -2,6 +2,7 @@
 glfw/3.3.8
 glm/cci.20230113
 tinyobjloader/2.0.0-rc10
+stb/cci.20230920
 
 [tool_requires]
 cmake/3.27.7

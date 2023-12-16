@@ -2,6 +2,7 @@
 // Created by Tristan Brault on 2023-12-06.
 //
 
+#include <numeric>
 #include "game_object.hpp"
 
 namespace te {
@@ -64,12 +65,51 @@ namespace te {
                        };
     }
 
-    GameObject GameObject::makePointLight(float intensity, float radius, glm::vec3 color) {
-        GameObject gameObj = GameObject::createGameObject();
+    VkDescriptorBufferInfo GameObject::getBufferInfo(int frameIndex) {
+        return gameObjectManager.getBufferInfoForGameObject(frameIndex, id);
+    }
+
+    GameObject::GameObject(id_t objId, const GameObjectManager& manager)
+            : id{objId}, gameObjectManager{manager} {}
+
+    GameObject& GameObjectManager::makePointLight(float intensity, float radius, glm::vec3 color) {
+        auto& gameObj = createGameObject();
         gameObj.color = color;
         gameObj.transform.scale.x = radius;
         gameObj.pointLight = std::make_unique<PointLightComponent>();
         gameObj.pointLight->lightIntensity = intensity;
         return gameObj;
+    }
+
+    GameObjectManager::GameObjectManager(Device& device) {
+        // including nonCoherentAtomSize allows us to flush a specific index at once
+        int alignment = std::lcm(
+                device.properties.limits.nonCoherentAtomSize,
+                device.properties.limits.minUniformBufferOffsetAlignment);
+        for (int i = 0; i < uboBuffers.size(); i++) {
+            uboBuffers[i] = std::make_unique<Buffer>(
+                    device,
+                    sizeof(GameObjectBufferData),
+                    GameObjectManager::MAX_GAME_OBJECTS,
+                    VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+                    VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+                    alignment);
+            uboBuffers[i]->map();
+        }
+
+        textureDefault = Texture::createTextureFromFile(device, "../textures/missing.png");
+    }
+
+    void GameObjectManager::updateBuffer(int frameIndex) {
+        // copy model matrix and normal matrix for each gameObj into
+        // buffer for this frame
+        for (auto& kv : gameObjects) {
+            auto& obj = kv.second;
+            GameObjectBufferData data{};
+            data.modelMatrix = obj.transform.mat4();
+            data.normalMatrix = obj.transform.normalMatrix();
+            uboBuffers[frameIndex]->writeToIndex(&data, kv.first);
+        }
+        uboBuffers[frameIndex]->flush();
     }
 }

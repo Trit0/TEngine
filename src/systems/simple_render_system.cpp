@@ -7,7 +7,6 @@
 // libs
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 
 #include <stdexcept>
@@ -33,7 +32,18 @@ namespace te {
         pushConstantRange.offset = 0;
         pushConstantRange.size = sizeof(SimplePushConstantData);
 
-        std::vector<VkDescriptorSetLayout> descriptorSetLayouts{globalSetLayout};
+        renderSystemLayout =
+                DescriptorSetLayout::Builder(device)
+                        .addBinding(
+                                0,
+                                VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+                                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT)
+                        .addBinding(1, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, VK_SHADER_STAGE_FRAGMENT_BIT)
+                        .build();
+
+        std::vector<VkDescriptorSetLayout> descriptorSetLayouts{
+                globalSetLayout,
+                renderSystemLayout->getDescriptorSetLayout()};
 
         VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
         pipelineLayoutInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -69,7 +79,28 @@ namespace te {
 
         for (auto& kv: frameInfo.gameObjects) {
             auto& obj = kv.second;
+
             if (obj.model == nullptr) continue;
+
+            // writing descriptor set each frame can slow performance
+            // would be more efficient to implement some sort of caching
+            auto bufferInfo = obj.getBufferInfo(frameInfo.frameIndex);
+            auto imageInfo = obj.diffuseMap->getImageInfo();
+            VkDescriptorSet gameObjectDescriptorSet;
+            DescriptorWriter(*renderSystemLayout, frameInfo.frameDescriptorPool)
+                    .writeBuffer(0, &bufferInfo)
+                    .writeImage(1, &imageInfo)
+                    .build(gameObjectDescriptorSet);
+
+            vkCmdBindDescriptorSets(
+                    frameInfo.commandBuffer,
+                    VK_PIPELINE_BIND_POINT_GRAPHICS,
+                    pipelineLayout,
+                    1,  // starting set (0 is the globalDescriptorSet, 1 is the set specific to this system)
+                    1,  // set count
+                    &gameObjectDescriptorSet,
+                    0,
+                    nullptr);
 
             SimplePushConstantData push{};
             push.modelMatrix = obj.transform.mat4();
