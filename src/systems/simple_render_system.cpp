@@ -3,6 +3,7 @@
 //
 
 #include "simple_render_system.hpp"
+#include "ecs_core/scene_manager.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS
@@ -13,6 +14,8 @@
 #include <stdexcept>
 
 namespace te {
+    extern SceneManager gSceneManager;
+
     struct SimplePushConstantData {
         glm::mat4 modelMatrix{1.0f};
         glm::mat4 normalMatrix{1.0f};
@@ -61,25 +64,43 @@ namespace te {
         );
     }
 
-    void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo) {
+    void SimpleRenderSystem::renderGameObjects(FrameInfo& frameInfo, std::set<Entity>& entities) {
         pipeline->bind(frameInfo.commandBuffer);
 
         vkCmdBindDescriptorSets(frameInfo.commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1,
                                 &frameInfo.globalDescriptorSet, 0, nullptr);
 
-        for (auto& kv: frameInfo.gameObjects) {
-            auto& obj = kv.second;
-            if (obj.model == nullptr) continue;
+        for (auto const& entity : entities) {
+            auto& model = gSceneManager.getComponent<std::shared_ptr<Model>>(entity);
+            auto& transform = gSceneManager.getComponent<TransformComponent>(entity);
+            if (model == nullptr) continue;
 
             SimplePushConstantData push{};
-            push.modelMatrix = obj.transform.mat4();
-            push.normalMatrix = obj.transform.normalMatrix();
+            push.modelMatrix = transform.mat4();
+            push.normalMatrix = transform.normalMatrix();
 
             vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout,
                                VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
                                sizeof(SimplePushConstantData), &push);
-            obj.model->bind(frameInfo.commandBuffer);
-            obj.model->draw(frameInfo.commandBuffer);
+            model->bind(frameInfo.commandBuffer);
+            model->draw(frameInfo.commandBuffer);
         }
+
+//        for (auto& kv: frameInfo.gameObjects) {
+//            auto& obj = kv.second;
+//            if (obj.model == nullptr) continue;
+//
+//            SimplePushConstantData push{};
+//            push.modelMatrix = obj.transform.mat4();
+//            push.normalMatrix = obj.transform.normalMatrix();
+//
+//            vkCmdPushConstants(frameInfo.commandBuffer, pipelineLayout,
+//                               VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT, 0,
+//                               sizeof(SimplePushConstantData), &push);
+//            obj.model->bind(frameInfo.commandBuffer);
+//            obj.model->draw(frameInfo.commandBuffer);
+//        }
+
+
     }
 }

@@ -9,6 +9,7 @@
 #include "../../game_object.hpp"
 
 #include <glm/glm.hpp>
+#include <iostream>
 
 namespace te {
 
@@ -31,8 +32,9 @@ namespace te {
                 auto& transform = gSceneManager.getComponent<TransformComponent>(entity);
                 auto const& gravity = gSceneManager.getComponent<Gravity>(entity);
 
-                transform.translation += rigidBody.velocity * dt;
-                rigidBody.velocity += gravity.force * dt;
+                transform.translation -= rigidBody.velocity * dt;
+                rigidBody.velocity += (gravity.force * 0.2f) * dt;
+                transform.rotation += (gravity.force * 0.2f) * dt;
             }
         }
     };

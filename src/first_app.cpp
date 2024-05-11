@@ -5,10 +5,15 @@
 #include "systems/point_light_system.hpp"
 #include "keyboard_movement_controller.hpp"
 #include "buffer.hpp"
+#include "ecs_core/scene_manager.hpp"
+#include "ecs_core/demo/physics.hpp"
+#include "ecs_core/demo/render_system.hpp"
 
 #include <chrono>
+#include <random>
 
 namespace te {
+
     FirstApp::FirstApp() {
         globalPool = DescriptorPool::Builder(device)
         .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -20,6 +25,10 @@ namespace te {
 
     FirstApp::~FirstApp() {
     }
+
+    std::shared_ptr<PhysicsSystem> physicsSystem;
+    std::shared_ptr<RenderSystem> renderSystem;
+    SceneManager gSceneManager;
 
     void FirstApp::run() {
         std::vector<std::unique_ptr<Buffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
@@ -80,6 +89,8 @@ namespace te {
             // camera.setOrthographicProjection(-aspect, aspect, -1, 1, -1, 1);
             camera.setPerspectiveProjection(glm::radians(50.f), aspect, .1f, 100.f);
 
+
+
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
                 FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects};
@@ -93,11 +104,15 @@ namespace te {
                 uboBuffers[frameIndex]->writeToBuffer(&ubo);
                 uboBuffers[frameIndex]->flush();
 
+                physicsSystem->update(frameTime);
+                std::cout << "Frame time: " << frameTime << std::endl;
+
                 // render
                 renderer.beginSwapChainRenderPass(commandBuffer);
 
                 //order here matters
-                simpleRenderSystem.renderGameObjects(frameInfo);
+                renderSystem->render(frameInfo, simpleRenderSystem);
+                // simpleRenderSystem.renderGameObjects(frameInfo);
                 pointLightSystem.render(frameInfo);
 
                 renderer.endSwapChainRenderPass(commandBuffer);
@@ -109,21 +124,21 @@ namespace te {
     }
 
     void FirstApp::loadGameObjects() {
-        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/flat_vase.obj");
+        std::shared_ptr<Model> cubeModel = Model::createModelFromFile(device, "../models/cube.obj");
         auto flatVase = GameObject::createGameObject();
-        flatVase.model = model;
-        flatVase.transform.translation = {0.5f, 0.5f, 0.f};
-        flatVase.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
+        flatVase.model = cubeModel;
+        flatVase.transform.translation = {0.0f, 0.0f, 0.f};
+        flatVase.transform.scale = glm::vec3{0.1f, 0.1f, 0.1f};
         gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
-        model = Model::createModelFromFile(device, "../models/smooth_vase.obj");
-        auto smoothVase = GameObject::createGameObject();
-        smoothVase.model = model;
-        smoothVase.transform.translation = {-0.5f, .5f, 0.f};
-        smoothVase.transform.scale = glm::vec3{3.0f, 1.5f, 3.0f};
-        gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
+//        cubeModel = Model::createModelFromFile(device, "../models/colored_cube.obj");
+//        auto smoothVase = GameObject::createGameObject();
+//        smoothVase.model = cubeModel;
+//        smoothVase.transform.translation = {-0.5f, .0f, 0.f};
+//        smoothVase.transform.scale = glm::vec3{0.1f, 0.1f, 0.1f};
+//        gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
-        model = Model::createModelFromFile(device, "../models/quad.obj");
+        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/quad.obj");
         auto floor = GameObject::createGameObject();
         floor.model = model;
         floor.transform.translation = {0.f, .5f, 0.f};
@@ -140,11 +155,66 @@ namespace te {
         };
 
         for (int i = 0; i < lightColors.size(); i++) {
-            auto pointLight = GameObject::makePointLight(0.2f);
+            auto pointLight = GameObject::makePointLight(50.f);
             pointLight.color = lightColors[i];
             auto rotateLight = glm::rotate(glm::mat4(1.f), (i * glm::two_pi<float>() / lightColors.size()), {0.f, -1.f, 0.f});
             pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
             gameObjects.emplace(pointLight.getId(), std::move(pointLight));
+        }
+
+        gSceneManager.init();
+
+        gSceneManager.registerComponent<Gravity>();
+        gSceneManager.registerComponent<RigidBody>();
+        gSceneManager.registerComponent<TransformComponent>();
+        gSceneManager.registerComponent<std::shared_ptr<Model>>();
+
+        physicsSystem = gSceneManager.registerSystem<PhysicsSystem>();
+        renderSystem = gSceneManager.registerSystem<RenderSystem>();
+
+        Signature signature;
+        signature.set(gSceneManager.getComponentType<Gravity>());
+        signature.set(gSceneManager.getComponentType<RigidBody>());
+        signature.set(gSceneManager.getComponentType<TransformComponent>());
+        signature.set(gSceneManager.getComponentType<std::shared_ptr<Model>>());
+        gSceneManager.setSystemSignature<PhysicsSystem>(signature);
+        gSceneManager.setSystemSignature<RenderSystem>(signature);
+
+        std::vector<Entity> entities(MAX_ENTITIES);
+
+        std::default_random_engine generator;
+        std::uniform_real_distribution<float> randPosition(-50.0f, 150.0f);
+        std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
+        std::uniform_real_distribution<float> randScale(1.f, 4.0f);
+        std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
+
+        float scale = randScale(generator);
+
+        for (auto& entity : entities)
+        {
+            entity = gSceneManager.createEntity();
+
+            gSceneManager.addComponent(
+                    entity,
+                    Gravity{glm::vec3(0.0f, randGravity(generator), 0.0f)});
+
+            gSceneManager.addComponent(
+                    entity,
+                    RigidBody{
+                            .velocity = glm::vec3(0.0f, 0.0f, 0.0f),
+                            .acceleration = glm::vec3(0.0f, 0.0f, 0.0f)
+                    });
+
+            gSceneManager.addComponent(
+                    entity,
+                    TransformComponent{
+                            .translation = glm::vec3(randPosition(generator), randPosition(generator), randPosition(generator) + 50.f),
+                            .scale = glm::vec3(scale, scale, scale),
+                            .rotation = glm::vec3(randRotation(generator), randRotation(generator), randRotation(generator))
+                    });
+
+            gSceneManager.addComponent(entity, cubeModel);
+
         }
     }
 } // namespace

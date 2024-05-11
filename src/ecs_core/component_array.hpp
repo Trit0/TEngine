@@ -19,17 +19,50 @@ namespace te {
     template<typename T>
     class ComponentArray : public IComponentArray {
     public:
-        void insertData(Entity entity, T component);
-        void removeData(Entity entity);
-        T& getData(Entity entity);
-        void entityDestroyed(Entity entity) override;
+        void insertData(Entity entity, T component) {
+            assert(mEntityToIndexMap.find(entity) == mEntityToIndexMap.end() && "Component added to same entity more than once.");
+
+            size_t newIndex = mSize;
+            mEntityToIndexMap[entity] = newIndex;
+            mIndexToEntityMap[newIndex] = entity;
+            mComponentArray[newIndex] = component;
+            ++mSize;
+        }
+
+        void removeData(Entity entity) {
+            assert(mEntityToIndexMap.find(entity) != mEntityToIndexMap.end() && "Removing non-existent component.");
+
+            size_t indexOfRemovedEntity = mEntityToIndexMap[entity];
+            size_t indexOfLastElement = mSize - 1;
+            mComponentArray[indexOfRemovedEntity] = mComponentArray[indexOfLastElement];
+
+            Entity entityOfLastElement = mIndexToEntityMap[indexOfLastElement];
+            mEntityToIndexMap[entityOfLastElement] = indexOfRemovedEntity;
+            mIndexToEntityMap[indexOfRemovedEntity] = entityOfLastElement;
+
+            mEntityToIndexMap.erase(entity);
+            mIndexToEntityMap.erase(indexOfLastElement);
+            --mSize;
+        }
+
+        T& getData(Entity entity) {
+            assert(mEntityToIndexMap.find(entity) != mEntityToIndexMap.end() && "Retrieving non-existent component.");
+
+            return mComponentArray[mEntityToIndexMap[entity]];
+        }
+
+        void entityDestroyed(Entity entity) override {
+            if (mEntityToIndexMap.find(entity) != mEntityToIndexMap.end()) {
+                removeData(entity);
+            }
+        }
 
 
     private:
-        std::array<T, MAX_ENTITIES> mComponentArray{};
-        std::unordered_map<Entity, size_t> mEntityToIndexMap{};
-        std::unordered_map<size_t, Entity> mIndexToEntityMap{};
-        size_t mSize{};
+        std::array<T, MAX_ENTITIES> mComponentArray;
+        std::unordered_map<Entity, size_t> mEntityToIndexMap;
+        std::unordered_map<size_t, Entity> mIndexToEntityMap;
+        size_t mSize;
     };
 
 } // te

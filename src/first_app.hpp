@@ -16,8 +16,8 @@
 namespace te {
     class FirstApp {
     public:
-        static const int WIDTH = 800;
-        static const int HEIGHT = 600;
+        static const int WIDTH = 1200;
+        static const int HEIGHT = 800;
 
         FirstApp();
         ~FirstApp();
@@ -28,7 +28,6 @@ namespace te {
         void run();
     private:
         void loadGameObjects();
-
 
         Window window{WIDTH, HEIGHT, "Vulkan Test"};
         Device device{window};

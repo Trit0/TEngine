@@ -41,7 +41,7 @@ namespace  te {
         GameObject(GameObject&&) = default;
         GameObject &operator=(GameObject&&) = default;
 
-        id_t getId() {
+        id_t getId() const {
             return id;
         }
 
