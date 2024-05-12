@@ -8,19 +8,19 @@
 #include "ecs_core/scene_manager.hpp"
 #include "ecs_core/demo/physics.hpp"
 #include "ecs_core/demo/render_system.hpp"
+#include "model_manager.hpp"
 
 #include <chrono>
-#include <random>
 
 namespace te {
 
-    FirstApp::FirstApp() {
+    FirstApp::FirstApp(std::unique_ptr<Scene> scene) {
         globalPool = DescriptorPool::Builder(device)
         .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
 
-        loadGameObjects();
+        loadScene(std::move(scene));
     }
 
     FirstApp::~FirstApp() {
@@ -105,7 +105,7 @@ namespace te {
                 uboBuffers[frameIndex]->flush();
 
                 physicsSystem->update(frameTime);
-                std::cout << "Frame time: " << frameTime << std::endl;
+                // std::cout << "Frame time: " << frameTime << std::endl;
 
                 // render
                 renderer.beginSwapChainRenderPass(commandBuffer);
@@ -123,13 +123,13 @@ namespace te {
         vkDeviceWaitIdle(device.device());
     }
 
-    void FirstApp::loadGameObjects() {
-        std::shared_ptr<Model> cubeModel = Model::createModelFromFile(device, "../models/cube.obj");
-        auto flatVase = GameObject::createGameObject();
-        flatVase.model = cubeModel;
-        flatVase.transform.translation = {0.0f, 0.0f, 0.f};
-        flatVase.transform.scale = glm::vec3{0.1f, 0.1f, 0.1f};
-        gameObjects.emplace(flatVase.getId(), std::move(flatVase));
+    void FirstApp::loadScene(std::unique_ptr<Scene> scene) {
+//        std::shared_ptr<Model> cubeModel = Model::createModelFromFile(device, "../models/cube.obj");
+//        auto flatVase = GameObject::createGameObject();
+//        flatVase.model = cubeModel;
+//        flatVase.transform.translation = {0.0f, 0.0f, 0.f};
+//        flatVase.transform.scale = glm::vec3{0.1f, 0.1f, 0.1f};
+//        gameObjects.emplace(flatVase.getId(), std::move(flatVase));
 
 //        cubeModel = Model::createModelFromFile(device, "../models/colored_cube.obj");
 //        auto smoothVase = GameObject::createGameObject();
@@ -138,12 +138,14 @@ namespace te {
 //        smoothVase.transform.scale = glm::vec3{0.1f, 0.1f, 0.1f};
 //        gameObjects.emplace(smoothVase.getId(), std::move(smoothVase));
 
-        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/quad.obj");
-        auto floor = GameObject::createGameObject();
-        floor.model = model;
-        floor.transform.translation = {0.f, .5f, 0.f};
-        floor.transform.scale = glm::vec3{3.0f, 1.f, 3.0f};
-        gameObjects.emplace(floor.getId(), std::move(floor));
+//        std::shared_ptr<Model> model = Model::createModelFromFile(device, "../models/quad.obj");
+//        auto floor = GameObject::createGameObject();
+//        floor.model = model;
+//        floor.transform.translation = {0.f, .5f, 0.f};
+//        floor.transform.scale = glm::vec3{3.0f, 1.f, 3.0f};
+//        gameObjects.emplace(floor.getId(), std::move(floor));
+
+
 
         std::vector<glm::vec3> lightColors{
           {1.f, .1f, .1f},
@@ -176,45 +178,86 @@ namespace te {
         signature.set(gSceneManager.getComponentType<Gravity>());
         signature.set(gSceneManager.getComponentType<RigidBody>());
         signature.set(gSceneManager.getComponentType<TransformComponent>());
+        // TODO register only model
         signature.set(gSceneManager.getComponentType<std::shared_ptr<Model>>());
         gSceneManager.setSystemSignature<PhysicsSystem>(signature);
         gSceneManager.setSystemSignature<RenderSystem>(signature);
 
-        std::vector<Entity> entities(MAX_ENTITIES);
+        scene->init(device);
 
-        std::default_random_engine generator;
-        std::uniform_real_distribution<float> randPosition(-50.0f, 150.0f);
-        std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
-        std::uniform_real_distribution<float> randScale(1.f, 4.0f);
-        std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
+//        auto scenePath = "../scenes/scene.json";
+//        simdjson::ondemand::parser parser;
+//        simdjson::padded_string json = simdjson::padded_string::load(scenePath);
+//        simdjson::ondemand::document content = parser.iterate(json);
+//        auto jsonEntities = content["entities"];
+//
+//        auto modelManager = ModelManager{};
+//
+//        for (auto jsonEntity : jsonEntities) {
+//            auto entity = gSceneManager.createEntity();
+//
+//            // Transform
+//            auto transform = jsonEntity["transform"];
+//            auto transformComponent = TransformComponent::fromJson(transform);
+//            std::cout << transformComponent.translation.x << std::endl;
+//            gSceneManager.addComponent(entity, transformComponent);
+//
+//            // Model
+//            std::string_view filePath;
+//            auto error = jsonEntity["model"].get(filePath);
+//            if (!error) {
+//                auto model = modelManager.getModel(device, std::string{filePath});
+//                gSceneManager.addComponent(entity, model);
+//            }
+//
+//            gSceneManager.addComponent(
+//                    entity,
+//                    Gravity{glm::vec3(0.0f, -5.f, 0.0f)});
+//
+//            gSceneManager.addComponent(
+//                    entity,
+//                    RigidBody{
+//                            .velocity = glm::vec3(0.0f, 0.0f, 0.0f),
+//                            .acceleration = glm::vec3(0.0f, 0.0f, 0.0f)
+//                    });
+//
+//        }
 
-        float scale = randScale(generator);
+//        std::vector<Entity> entities(MAX_ENTITIES);
+//
+//        std::default_random_engine generator;
+//        std::uniform_real_distribution<float> randPosition(-50.0f, 150.0f);
+//        std::uniform_real_distribution<float> randRotation(0.0f, 3.0f);
+//        std::uniform_real_distribution<float> randScale(1.f, 4.0f);
+//        std::uniform_real_distribution<float> randGravity(-10.0f, -1.0f);
+//
+//        float scale = randScale(generator);
 
-        for (auto& entity : entities)
-        {
-            entity = gSceneManager.createEntity();
-
-            gSceneManager.addComponent(
-                    entity,
-                    Gravity{glm::vec3(0.0f, randGravity(generator), 0.0f)});
-
-            gSceneManager.addComponent(
-                    entity,
-                    RigidBody{
-                            .velocity = glm::vec3(0.0f, 0.0f, 0.0f),
-                            .acceleration = glm::vec3(0.0f, 0.0f, 0.0f)
-                    });
-
-            gSceneManager.addComponent(
-                    entity,
-                    TransformComponent{
-                            .translation = glm::vec3(randPosition(generator), randPosition(generator), randPosition(generator) + 50.f),
-                            .scale = glm::vec3(scale, scale, scale),
-                            .rotation = glm::vec3(randRotation(generator), randRotation(generator), randRotation(generator))
-                    });
-
-            gSceneManager.addComponent(entity, cubeModel);
-
-        }
+//        for (auto& entity : entities)
+//        {
+//            entity = gSceneManager.createEntity();
+//
+//            gSceneManager.addComponent(
+//                    entity,
+//                    Gravity{glm::vec3(0.0f, randGravity(generator), 0.0f)});
+//
+//            gSceneManager.addComponent(
+//                    entity,
+//                    RigidBody{
+//                            .velocity = glm::vec3(0.0f, 0.0f, 0.0f),
+//                            .acceleration = glm::vec3(0.0f, 0.0f, 0.0f)
+//                    });
+//
+//            gSceneManager.addComponent(
+//                    entity,
+//                    TransformComponent{
+//                            .translation = glm::vec3(randPosition(generator), randPosition(generator), randPosition(generator) + 50.f),
+//                            .scale = glm::vec3(scale, scale, scale),
+//                            .rotation = glm::vec3(randRotation(generator), randRotation(generator), randRotation(generator))
+//                    });
+//
+//            gSceneManager.addComponent(entity, cubeModel);
+//
+//        }
     }
 } // namespace

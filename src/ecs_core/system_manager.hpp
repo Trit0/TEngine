@@ -52,9 +52,6 @@ namespace te {
             }
         }
 
-
-
-
     private:
         std::unordered_map<const char*, Signature> mSignatures{};
         std::unordered_map<const char*, std::shared_ptr<System>> mSystems{};

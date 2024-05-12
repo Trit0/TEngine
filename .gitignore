@@ -3,3 +3,8 @@
 /include
 CMakeUserPresets.json
 **/*.spv
+**/.vscode
+**/.idea
+**/node_modules
+**/dist
+package-lock.json
