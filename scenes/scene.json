@@ -1,0 +1,84 @@
+{
+  "entities": [
+    {
+      "transform": {
+        "translation": {
+          "x": -30.0,
+          "y": 32.0,
+          "z": 30.0
+        },
+        "rotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 10.0,
+          "y": 10.0,
+          "z": 10.0
+        }
+      },
+      "model": "../models/cube.obj"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 20.0,
+          "y": 22.0,
+          "z": 20.0
+        },
+        "rotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 10.0,
+          "y": 10.0,
+          "z": 10.0
+        }
+      },
+      "model": "../models/cube.obj"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": -10.0,
+          "y": 12.0,
+          "z": 10.0
+        },
+        "rotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 10.0,
+          "y": 10.0,
+          "z": 10.0
+        }
+      },
+      "model": "../models/cube.obj"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 10.0,
+          "y": 12.0,
+          "z": -10.0
+        },
+        "rotation": {
+          "x": 0.0,
+          "y": 0.0,
+          "z": 0.0
+        },
+        "scale": {
+          "x": 5.0,
+          "y": 5.0,
+          "z": 5.0
+        }
+      },
+      "model": "../models/cube.obj"
+    }
+  ]
+}

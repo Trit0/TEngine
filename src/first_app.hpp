@@ -8,6 +8,7 @@
 #include "game_object.hpp"
 #include "renderer.hpp"
 #include "descriptors.hpp"
+#include "scene.hpp"
 
 #include <memory>
 #include <vector>
@@ -16,10 +17,10 @@
 namespace te {
     class FirstApp {
     public:
-        static const int WIDTH = 800;
-        static const int HEIGHT = 600;
+        static const int WIDTH = 1200;
+        static const int HEIGHT = 800;
 
-        FirstApp();
+        FirstApp(std::unique_ptr<Scene> scene);
         ~FirstApp();
 
         FirstApp(const FirstApp&) = delete;
@@ -27,8 +28,7 @@ namespace te {
 
         void run();
     private:
-        void loadGameObjects();
-
+        void loadScene(std::unique_ptr<Scene> scene);
 
         Window window{WIDTH, HEIGHT, "Vulkan Test"};
         Device device{window};

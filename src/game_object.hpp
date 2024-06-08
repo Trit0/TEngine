@@ -7,6 +7,7 @@
 #include "model.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
+#include <simdjson.h>
 #include <unordered_map>
 
 namespace  te {
@@ -17,9 +18,22 @@ namespace  te {
 
         // Matrix corrsponds to Translate * Ry * Rx * Rz * Scale
         // Rotations correspond to Tait-bryan angles of Y(1), X(2), Z(3)
-        // https://en.wikipedia.org/wiki/Euler_angles#Rotation_matrix
+        // https://en.wikipedia.org/wiki/Exluler_angles#Rotation_matrix
         glm::mat4 mat4();
         glm::mat3 normalMatrix();
+        static TransformComponent fromJson(simdjson::simdjson_result<simdjson::ondemand::value> json) {
+            auto transformComponent = TransformComponent{};
+            transformComponent.translation.x = json["translation"]["x"].get_double().value();
+            transformComponent.translation.y = json["translation"]["y"].get_double().value();
+            transformComponent.translation.z = json["translation"]["z"].get_double().value();
+            transformComponent.rotation.x = json["rotation"]["x"].get_double().value();
+            transformComponent.rotation.y = json["rotation"]["y"].get_double().value();
+            transformComponent.rotation.z = json["rotation"]["z"].get_double().value();
+            transformComponent.scale.x = json["scale"]["x"].get_double().value();
+            transformComponent.scale.y = json["scale"]["y"].get_double().value();
+            transformComponent.scale.z = json["scale"]["z"].get_double().value();
+            return transformComponent;
+        }
     };
 
     struct PointLightComponent {
@@ -41,7 +55,7 @@ namespace  te {
         GameObject(GameObject&&) = default;
         GameObject &operator=(GameObject&&) = default;
 
-        id_t getId() {
+        id_t getId() const {
             return id;
         }
 

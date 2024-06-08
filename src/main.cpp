@@ -1,11 +1,14 @@
 #include "first_app.hpp"
+#include "scene.hpp"
+
 
 #include <cstdlib>
 #include <iostream>
 #include <stdexcept>
 
 int main() {
-    te::FirstApp app = te::FirstApp();
+    auto scene = te::Scene::fromJson("../scenes/sceneTS.json");
+    te::FirstApp app = te::FirstApp(std::move(scene));
 
     try {
         app.run();
