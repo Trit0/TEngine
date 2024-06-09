@@ -21,7 +21,7 @@ namespace te {
         SimpleRenderSystem(const SimpleRenderSystem&) = delete;
         SimpleRenderSystem &operator=(const SimpleRenderSystem&) = delete;
 
-        void renderGameObjects(FrameInfo& frameInfo, std::set<Entity>& entities);
+        void renderGameObjects(FrameInfo& frameInfo, std::set<Entity>& entities, const std::unordered_map<Entity, VkDescriptorBufferInfo>& descriptors);
     private:
         void createPipelineLayout(VkDescriptorSetLayout globalSetLayout);
         void createPipeline(VkRenderPass renderPass);
@@ -31,7 +31,9 @@ namespace te {
         Device& device;
 
         std::unique_ptr<Pipeline> pipeline;
+        std::unique_ptr<Pipeline> pipelineTextured;
         VkPipelineLayout pipelineLayout;
+        std::unique_ptr<DescriptorSetLayout> renderSystemLayout;
     };
 }
 

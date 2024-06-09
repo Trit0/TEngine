@@ -4,7 +4,7 @@
 
 #include "json_scene.hpp"
 
-#include "model_manager.hpp"
+#include "resource_manager.hpp"
 #include "game_object.hpp"
 #include "ecs_core/demo/physics.hpp"
 #include "device.hpp"
@@ -24,28 +24,38 @@ namespace te {
         simdjson::ondemand::document content = parser.iterate(json);
         auto jsonEntities = content["entities"];
 
-        auto modelManager = ModelManager{};
-
+        auto resourceManager = ResourceManager{};
+        int count = 0;
         for (auto jsonEntity : jsonEntities) {
             auto entity = gSceneManager.createEntity();
+            count++;
 
             // Transform
             auto transform = jsonEntity["transform"];
             auto transformComponent = TransformComponent::fromJson(transform);
-            std::cout << transformComponent.translation.x << std::endl;
             gSceneManager.addComponent(entity, transformComponent);
 
             // Model
             std::string_view filePath;
             auto error = jsonEntity["model"].get(filePath);
             if (!error) {
-                auto model = modelManager.getModel(device, std::string{filePath});
+                auto model = resourceManager.getModel(device, std::string{filePath});
                 gSceneManager.addComponent(entity, model);
             }
 
-            gSceneManager.addComponent(
-                    entity,
-                    Gravity{glm::vec3(0.0f, -5.f, 0.0f)});
+            //Texture
+            error = jsonEntity["texture"].get(filePath);
+            if (!error) {
+                auto texture = resourceManager.getTexture(device, std::string{filePath});
+//                auto side = std::string{"../textures/crate.png"};
+//                auto top = std::string{"../textures/crate.png"};
+//                auto texture = resourceManager.getTextureCubeMap(device, std::array{ top, side, side, side, side, top });
+                gSceneManager.addComponent(entity, texture);
+            }
+
+//            gSceneManager.addComponent(
+//                    entity,
+//                    Gravity{glm::vec3(0.0f, -5.f, 0.0f)});
 
             gSceneManager.addComponent(
                     entity,
@@ -55,5 +65,6 @@ namespace te {
                     });
 
         }
+        std::cout << count << " entities loaded" << std::endl;
     }
 } // te

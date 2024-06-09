@@ -9,6 +9,7 @@
 #include <bitset>
 #include <queue>
 #include <cassert>
+#include <array>
 
 namespace te {
     using Entity = uint32_t;

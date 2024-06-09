@@ -33,6 +33,11 @@ namespace te {
         const glm::vec3 rightDir{forwardDir.z, 0.f, -forwardDir.x};
         const glm::vec3 upDir{0.f, -1.f, 0.f};
 
+        float tmpMoveSpeed = moveSpeed;
+        if (glfwGetKey(window, keys.leftShift) == GLFW_PRESS) {
+            tmpMoveSpeed *= 5;
+        }
+
         glm::vec3 moveDir{0.f};
         if (glfwGetKey(window, keys.moveForward) == GLFW_PRESS) {
             moveDir += forwardDir;
@@ -54,7 +59,7 @@ namespace te {
         }
 
         if(glm::dot(moveDir, moveDir) > std::numeric_limits<float>::epsilon()) {
-            gameObject.transform.translation += moveSpeed * deltaTime * glm::normalize(moveDir);
+            gameObject.transform.translation += tmpMoveSpeed * deltaTime * glm::normalize(moveDir);
         }
     }
 

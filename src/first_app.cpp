@@ -7,8 +7,9 @@
 #include "buffer.hpp"
 #include "ecs_core/scene_manager.hpp"
 #include "ecs_core/demo/physics.hpp"
-#include "ecs_core/demo/render_system.hpp"
-#include "model_manager.hpp"
+#include "resource_manager.hpp"
+#include "texture.hpp"
+#include "ecs_core/demo/render_system_textured.hpp"
 
 #include <chrono>
 
@@ -20,6 +21,17 @@ namespace te {
         .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
         .build();
 
+        // build frame descriptor pools
+        framePools.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
+        auto framePoolBuilder = DescriptorPool::Builder(device)
+                .setMaxSets(1000)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000)
+                .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000)
+                .setPoolFlags(VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT);
+        for (int i = 0; i < framePools.size(); i++) {
+            framePools[i] = framePoolBuilder.build();
+        }
+
         loadScene(std::move(scene));
     }
 
@@ -27,7 +39,7 @@ namespace te {
     }
 
     std::shared_ptr<PhysicsSystem> physicsSystem;
-    std::shared_ptr<RenderSystem> renderSystem;
+    std::shared_ptr<RenderSystemTextured> renderSystemTextured;
     SceneManager gSceneManager;
 
     void FirstApp::run() {
@@ -55,10 +67,14 @@ namespace te {
                 .build(globalDescriptorSets[i]);
         }
 
+        std::cout << "Alignment: " << device.properties.limits.minUniformBufferOffsetAlignment << "\n";
+        std::cout << "Atom size: " << device.properties.limits.nonCoherentAtomSize << "\n";
+
         SimpleRenderSystem simpleRenderSystem{
             device,
             renderer.getSwapChainRenderPass(),
             globalSetLayout->getDescriptorSetLayout()};
+
 
         PointLightSystem pointLightSystem{
             device,
@@ -69,7 +85,7 @@ namespace te {
         // camera.setViewDirection(glm::vec3{0.f}, glm::vec3{.5f, 0.f, 1.f});
         camera.setViewTarget(glm::vec3{-1.f, -2.f, 2.f}, glm::vec3{0.f, 0.f, 2.5f});
 
-        auto viewerObject = GameObject::createGameObject();
+        auto& viewerObject = gameObjectManager.createGameObject();
         viewerObject.transform.translation.z = -2.5f;
         KeyboardMovementController cameraController{};
 
@@ -93,9 +109,10 @@ namespace te {
 
             if (auto commandBuffer = renderer.beginFrame()) {
                 int frameIndex = renderer.getFrameIndex();
-                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], gameObjects};
+                framePools[frameIndex]->resetPool();
+                FrameInfo frameInfo{frameIndex, frameTime, commandBuffer, camera, globalDescriptorSets[frameIndex], *framePools[frameIndex], gameObjectManager.gameObjects};
 
-                //update
+                //updateBuffers
                 GlobalUbo ubo{};
                 ubo.projection = camera.getProjectionMatrix();
                 ubo.view = camera.getViewMatrix();
@@ -105,13 +122,20 @@ namespace te {
                 uboBuffers[frameIndex]->flush();
 
                 physicsSystem->update(frameTime);
-                // std::cout << "Frame time: " << frameTime << std::endl;
+                std::cout << "Frame time: " << frameTime << std::endl;
+
+                // final step of updateBuffers is updating the game objects buffer data
+                // The render functions MUST not change a game objects transform data
+                //gameObjectManager.updateBuffer(frameIndex);
+                //renderSystem->updateBuffers(frameInfo);
+                renderSystemTextured->updateBuffers(frameInfo);
 
                 // render
                 renderer.beginSwapChainRenderPass(commandBuffer);
 
                 //order here matters
-                renderSystem->render(frameInfo, simpleRenderSystem);
+                renderSystemTextured->render(frameInfo, simpleRenderSystem);
+                //renderSystem->render(frameInfo, simpleRenderSystemNormal);
                 // simpleRenderSystem.renderGameObjects(frameInfo);
                 pointLightSystem.render(frameInfo);
 
@@ -157,11 +181,10 @@ namespace te {
         };
 
         for (int i = 0; i < lightColors.size(); i++) {
-            auto pointLight = GameObject::makePointLight(50.f);
+            auto& pointLight = gameObjectManager.makePointLight(50.f);
             pointLight.color = lightColors[i];
             auto rotateLight = glm::rotate(glm::mat4(1.f), (i * glm::two_pi<float>() / lightColors.size()), {0.f, -1.f, 0.f});
             pointLight.transform.translation = glm::vec3(rotateLight * glm::vec4(-1.f, -1.f, -1.f, 1.f));
-            gameObjects.emplace(pointLight.getId(), std::move(pointLight));
         }
 
         gSceneManager.init();
@@ -170,18 +193,27 @@ namespace te {
         gSceneManager.registerComponent<RigidBody>();
         gSceneManager.registerComponent<TransformComponent>();
         gSceneManager.registerComponent<std::shared_ptr<Model>>();
+        gSceneManager.registerComponent<std::shared_ptr<Texture>>();
 
         physicsSystem = gSceneManager.registerSystem<PhysicsSystem>();
-        renderSystem = gSceneManager.registerSystem<RenderSystem>();
+        renderSystemTextured = gSceneManager.registerSystem<RenderSystemTextured>();
 
         Signature signature;
-        signature.set(gSceneManager.getComponentType<Gravity>());
-        signature.set(gSceneManager.getComponentType<RigidBody>());
         signature.set(gSceneManager.getComponentType<TransformComponent>());
         // TODO register only model
         signature.set(gSceneManager.getComponentType<std::shared_ptr<Model>>());
+        gSceneManager.setSystemSignature<RenderSystemTextured>(signature);
+
+        signature.set(gSceneManager.getComponentType<Gravity>());
+        signature.set(gSceneManager.getComponentType<RigidBody>());
         gSceneManager.setSystemSignature<PhysicsSystem>(signature);
-        gSceneManager.setSystemSignature<RenderSystem>(signature);
+
+        //signature.set(gSceneManager.getComponentType<std::shared_ptr<Texture>>());
+
+        //gSceneManager.setSystemSignature<RenderSystemTextured>(signature);
+
+        //renderSystem->init(device);
+        renderSystemTextured->init(device);
 
         scene->init(device);
 
@@ -191,7 +223,7 @@ namespace te {
 //        simdjson::ondemand::document content = parser.iterate(json);
 //        auto jsonEntities = content["entities"];
 //
-//        auto modelManager = ModelManager{};
+//        auto modelManager = ResourceManager{};
 //
 //        for (auto jsonEntity : jsonEntities) {
 //            auto entity = gSceneManager.createEntity();

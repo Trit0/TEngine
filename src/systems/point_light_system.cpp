@@ -76,7 +76,7 @@ namespace te {
 
             assert(lightIndex < MAX_LIGHTS && "Point lights exceed maximum specified");
 
-            //update light position
+            //updateBuffers light position
             obj.transform.translation = glm::vec3(rotateLight * glm::vec4(obj.transform.translation, 1.f));
 
             // copy light to ubo
