@@ -46,9 +46,13 @@ namespace te {
         }
 
         T& getData(Entity entity) {
-            assert(mEntityToIndexMap.find(entity) != mEntityToIndexMap.end() && "Retrieving non-existent component.");
+            assert(dataExist(entity) && "Retrieving non-existent component.");
 
             return mComponentArray[mEntityToIndexMap[entity]];
+        }
+
+        bool dataExist(Entity entity) {
+            return mEntityToIndexMap.find(entity) != mEntityToIndexMap.end();
         }
 
         void entityDestroyed(Entity entity) override {

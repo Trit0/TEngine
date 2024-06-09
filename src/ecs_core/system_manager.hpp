@@ -31,6 +31,19 @@ namespace te {
             mSignatures.insert({typeName, signature});
         }
 
+        template<typename T>
+        Signature getSignature() {
+            const char* typeName = typeid(T).name();
+            assert(mSystems.find(typeName) != mSystems.end() && "System used before registration.");
+
+            auto count = mSignatures.count(typeName);
+            if (count == 0) {
+                mSignatures.insert({typeName, Signature{}});
+            }
+
+            return mSignatures.at(typeName);
+        }
+
         void entityDestroyed(Entity entity) {
             for (auto const& pair : mSystems) {
                 auto const& system = pair.second;

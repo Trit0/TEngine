@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.26)
 project(TEngine)
 
 set(CMAKE_TOOLCHAIN_FILE include/conan_toolchain.cmake)
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
 
@@ -13,6 +13,7 @@ find_package(GLM REQUIRED)
 find_package(Vulkan REQUIRED)
 find_package(tinyobjloader REQUIRED)
 find_package(simdjson REQUIRED)
+find_package(stb REQUIRED)
 
 set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 file(GLOB SHADER_FILES ${SHADERS_DIR}/*.frag ${SHADERS_DIR}/*.vert)
@@ -63,5 +64,5 @@ compile_shader(${PROJECT_NAME}
         SOURCES ${SHADER_FILES}
 )
 
-target_link_libraries(${PROJECT_NAME} glfw glm::glm Vulkan::Vulkan tinyobjloader::tinyobjloader simdjson::simdjson)
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src ${glfw3_INCLUDE_DIRS} ${glm_INCLUDE_DIRS} ${tinyobjloader_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} glfw glm::glm Vulkan::Vulkan tinyobjloader::tinyobjloader simdjson::simdjson stb::stb)
+target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src PUBLIC ${glfw3_INCLUDE_DIRS} ${glm_INCLUDE_DIRS} ${tinyobjloader_INCLUDE_DIRS})

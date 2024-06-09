@@ -36,6 +36,7 @@ namespace te {
                 rigidBody.velocity += (gravity.force * 0.2f) * dt;
                 transform.rotation += (gravity.force * 0.2f) * dt;
             }
+            std::cout << mEntities.size() << " entities in physics" << std::endl;
         }
     };
 }

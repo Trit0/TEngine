@@ -27,7 +27,8 @@ class Device {
 #ifdef NDEBUG
   const bool enableValidationLayers = false;
 #else
-  const bool enableValidationLayers = true;
+  //TODO weird
+  const bool enableValidationLayers = false;
 #endif
 
   Device(Window &window);
@@ -69,6 +70,14 @@ class Device {
       VkMemoryPropertyFlags properties,
       VkImage &image,
       VkDeviceMemory &imageMemory);
+
+  void transitionImageLayout(
+          VkImage image,
+          VkFormat format,
+          VkImageLayout oldLayout,
+          VkImageLayout newLayout,
+          uint32_t mipLevels = 1,
+          uint32_t layerCount = 1);
 
   VkPhysicalDeviceProperties properties;
 

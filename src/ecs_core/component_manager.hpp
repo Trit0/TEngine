@@ -50,6 +50,11 @@ namespace te {
             return getComponentArray<T>()->getData(entity);
         }
 
+        template<typename T>
+        bool componentExist(Entity entity){
+            return getComponentArray<T>()->dataExist(entity);
+        }
+
         void entityDestroyed(Entity entity) {
             for (auto const& pair : mComponentArrays) {
                 auto const& component = pair.second;

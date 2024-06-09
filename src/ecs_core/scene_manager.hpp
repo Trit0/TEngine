@@ -62,6 +62,11 @@ namespace te {
         }
 
         template<typename T>
+        bool componentExist(Entity entity) {
+            return mComponentManager->componentExist<T>(entity);
+        }
+
+        template<typename T>
         ComponentType getComponentType() {
             return mComponentManager->getComponentType<T>();
         }
@@ -74,6 +79,11 @@ namespace te {
         template<typename T>
         void setSystemSignature(Signature signature) {
             mSystemManager->setSignature<T>(signature);
+        }
+
+        template<typename T>
+        Signature getSystemSignature() {
+            return mSystemManager->getSignature<T>();
         }
 
 
