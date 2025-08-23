@@ -1,0 +1,193 @@
+{
+  "entities": [
+    {
+      "transform": {
+        "translation": {
+          "x": 0,
+          "y": 20,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 3,
+          "y": 3,
+          "z": 3
+        }
+      },
+      "model": "assets/models/box.obj",
+      "texture": "assets/textures/grass_block_side.png"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 9,
+          "y": 20,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 3,
+          "y": 3,
+          "z": 3
+        }
+      },
+      "model": "assets/models/box.obj",
+      "texture": "assets/textures/grass_block_side.png"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 18,
+          "y": 20,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 3,
+          "y": 3,
+          "z": 3
+        }
+      },
+      "model": "assets/models/box.obj",
+      "texture": "assets/textures/grass_block_side.png"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 0,
+          "y": 20,
+          "z": 9
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 3,
+          "y": 3,
+          "z": 3
+        }
+      },
+      "model": "assets/models/box.obj",
+      "texture": "assets/textures/grass_block_side.png"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 9,
+          "y": 20,
+          "z": 9
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 3,
+          "y": 3,
+          "z": 3
+        }
+      },
+      "model": "assets/models/box.obj",
+      "texture": "assets/textures/grass_block_side.png"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 18,
+          "y": 20,
+          "z": 9
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 3,
+          "y": 3,
+          "z": 3
+        }
+      },
+      "model": "assets/models/box.obj",
+      "texture": "assets/textures/grass_block_side.png"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 0,
+          "y": 20,
+          "z": 18
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 3,
+          "y": 3,
+          "z": 3
+        }
+      },
+      "model": "assets/models/box.obj",
+      "texture": "assets/textures/grass_block_side.png"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 9,
+          "y": 20,
+          "z": 18
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 3,
+          "y": 3,
+          "z": 3
+        }
+      },
+      "model": "assets/models/box.obj",
+      "texture": "assets/textures/grass_block_side.png"
+    },
+    {
+      "transform": {
+        "translation": {
+          "x": 18,
+          "y": 20,
+          "z": 18
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 3,
+          "y": 3,
+          "z": 3
+        }
+      },
+      "model": "assets/models/box.obj",
+      "texture": "assets/textures/grass_block_side.png"
+    }
+  ]
+}
