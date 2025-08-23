@@ -97,7 +97,7 @@ namespace te {
             uboBuffers[i]->map();
         }
 
-        textureDefault = Texture::createTextureFromFile(device, "../textures/missing.png");
+        textureDefault = Texture::createTextureFromFile(device, "./assets/textures/missing.png");
     }
 
     void GameObjectManager::updateBuffer(int frameIndex) {

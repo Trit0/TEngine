@@ -1,6 +1,6 @@
 import { Scene } from "./interfaces/scene";
 import { Transform } from "./interfaces/transform";
-import { MAX_ENTITIES, randomInt } from "./index";
+import {ASSETS_PATH, MAX_ENTITIES, randomInt} from "./index";
 
 export function bunchOfCubes(scene: Scene) {
     for (let i = 0; i < MAX_ENTITIES; i++) {
@@ -23,8 +23,8 @@ export function bunchOfCubes(scene: Scene) {
 
 export function planeOfCubes(scene: Scene) {
     const rowLength = 3;
-    const model = "../models/box.obj";
-    const texture = "../textures/grass_block_side.png";
+    const model = `assets/models/box.obj`;
+    const texture = `assets/textures/grass_block_side.png`;
     const cubeSize = 6;
     const spacing = 3;
     for (let i = 0; i < 9; i++) {

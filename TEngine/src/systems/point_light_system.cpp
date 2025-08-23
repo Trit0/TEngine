@@ -61,8 +61,8 @@ namespace te {
         pipelineConfig.pipelineLayout = pipelineLayout;
         pipeline = std::make_unique<Pipeline>(
             device,
-            "../shaders/point_light.vert.spv",
-            "../shaders/point_light.frag.spv",
+            "shaders/point_light.vert.spv",
+            "shaders/point_light.frag.spv",
             pipelineConfig
         );
     }

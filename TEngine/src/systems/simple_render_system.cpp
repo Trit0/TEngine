@@ -68,14 +68,14 @@ namespace te {
         pipelineConfig.pipelineLayout = pipelineLayout;
         pipelineTextured = std::make_unique<Pipeline>(
             device,
-            "../shaders/simple_shader_texture.vert.spv",
-            "../shaders/simple_shader_texture.frag.spv",
+            "shaders/simple_shader_texture.vert.spv",
+            "shaders/simple_shader_texture.frag.spv",
             pipelineConfig
         );
         pipeline = std::make_unique<Pipeline>(
                 device,
-                "../shaders/simple_shader_color.vert.spv",
-                "../shaders/simple_shader_color.frag.spv",
+                "shaders/simple_shader_color.vert.spv",
+                "shaders/simple_shader_color.frag.spv",
                 pipelineConfig
         );
     }

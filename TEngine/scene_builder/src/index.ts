@@ -10,10 +10,11 @@ const scene: Scene = {
 }
 
 export const MAX_ENTITIES = 5000;
+export const ASSETS_PATH = "../../SampleGame/assets"
 
 planeOfCubes(scene);
 
-writeFileSync("../scenes/sceneTS.json",  JSON.stringify(scene, null, 2), "utf-8");
+writeFileSync(`${ASSETS_PATH}/scenes/sceneTS.json`,  JSON.stringify(scene, null, 2), "utf-8");
 
 console.log("Scene generated!");
 

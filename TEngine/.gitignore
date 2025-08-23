@@ -1,0 +1,11 @@
+/build
+/cmake-build-debug**
+/include
+/conan_deps
+CMakeUserPresets.json
+**/*.spv
+**/.vscode
+**/.idea
+**/node_modules
+**/dist
+package-lock.json

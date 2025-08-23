@@ -7,6 +7,7 @@
 // std
 #include <stdexcept>
 #include <array>
+#include <iostream>
 
 namespace te {
     Texture::Texture(Device &device, const std::string &textureFilePath) : mDevice{device} {
@@ -145,7 +146,9 @@ namespace te {
 
         for (int i = 0; i < mLayerCount; i++) {
             if (!textureData[i]) {
-                throw std::runtime_error("failed to load texture image!");
+                std::string errorMsg = "failed to load texture image! ";
+                errorMsg.append(textureFilePaths[i].c_str());
+                throw std::runtime_error(errorMsg);
             }
         }
 
@@ -259,7 +262,9 @@ namespace te {
         VkDeviceSize imageSize = texWidth * texHeight * 4;
 
         if (!pixels) {
-            throw std::runtime_error("failed to load texture image!");
+            std::string errorMsg = "failed to load texture image! ";
+            errorMsg.append(filepath);
+            throw std::runtime_error(errorMsg);
         }
 
         // mMipLevels = static_cast<uint32_t>(std::floor(std::log2(std::max(texWidth, texHeight)))) + 1;
