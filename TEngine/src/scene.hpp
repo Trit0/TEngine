@@ -8,6 +8,7 @@
 #include "rendering/device.hpp"
 
 #include <string>
+#include <iostream>
 
 namespace te {
 
@@ -17,7 +18,12 @@ namespace te {
     public:
         static std::unique_ptr<Scene> fromJson(const std::string& filePath);
         virtual void init(Device& device) = 0;
-        virtual ~Scene() {};
+        virtual void free() = 0;
+        virtual ~Scene() {
+            std::cout << "Freeing scene" << std::endl;
+        };
+    protected:
+        std::vector<uint32_t> entities{};
     };
 
 } // te

@@ -10,6 +10,7 @@
 // std
 #include <cassert>
 #include <cstring>
+#include <iostream>
 
 namespace te {
     /**
@@ -46,6 +47,7 @@ namespace te {
     }
 
     Buffer::~Buffer() {
+        std::cout << "Freeing buffer" << std::endl;
         unmap();
         vkDestroyBuffer(device.device(), buffer, nullptr);
         vkFreeMemory(device.device(), memory, nullptr);
@@ -72,6 +74,7 @@ namespace te {
      */
     void Buffer::unmap() {
         if (mapped) {
+            std::cout << "Test " << instanceCount << std::endl;
             vkUnmapMemory(device.device(), memory);
             mapped = nullptr;
         }

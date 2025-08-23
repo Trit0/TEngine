@@ -28,6 +28,7 @@ namespace te {
         int count = 0;
         for (auto jsonEntity : jsonEntities) {
             auto entity = gSceneManager.createEntity();
+            this->entities.push_back(entity);
             count++;
 
             // Transform
@@ -66,5 +67,11 @@ namespace te {
 
         }
         std::cout << count << " entities loaded" << std::endl;
+    }
+
+    void JsonScene::free() {
+        for (auto entity : this->entities) {
+            gSceneManager.destroyEntity(entity);
+        }
     }
 } // te

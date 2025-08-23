@@ -5,6 +5,7 @@
 #include "window.hpp"
 
 #include <stdexcept>
+#include <iostream>
 
 namespace te {
     Window::Window(const int w, int h, std::string name): width(w), height(h), windowName(name) {
@@ -12,6 +13,7 @@ namespace te {
     }
 
     Window::~Window() {
+        std::cout << "Freeing window" << std::endl;
         glfwDestroyWindow(window);
         glfwTerminate();
     }

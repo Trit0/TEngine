@@ -111,6 +111,7 @@ namespace te {
     }
 
     Texture::~Texture() {
+        std::cout << "Freeing texture " << source << std::endl;
         vkDestroySampler(mDevice.device(), mTextureSampler, nullptr);
         vkDestroyImageView(mDevice.device(), mTextureImageView, nullptr);
         vkDestroyImage(mDevice.device(), mTextureImage, nullptr);

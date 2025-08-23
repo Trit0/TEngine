@@ -9,11 +9,16 @@
 #include "system_manager.hpp"
 
 #include <memory>
+#include <iostream>
 
 namespace te {
 
     class SceneManager {
     public:
+        ~SceneManager() {
+            std::cout << "Freeing scene manager" << std::endl;
+        }
+
         void init() {
             mComponentManager = std::make_unique<ComponentManager>();
             mEntityManager = std::make_unique<EntityManager>();

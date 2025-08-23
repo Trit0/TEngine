@@ -11,6 +11,7 @@
 #include <glm/gtc/constants.hpp>
 
 #include <stdexcept>
+#include <iostream>
 
 namespace te {
     extern SceneManager gSceneManager;
@@ -26,6 +27,7 @@ namespace te {
     }
 
     SimpleRenderSystem::~SimpleRenderSystem() {
+        std::cout << "Freeing simple render system" << std::endl;
         vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
     }
 

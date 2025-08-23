@@ -9,6 +9,8 @@
 #include "rendering/renderer.hpp"
 #include "rendering/descriptors.hpp"
 #include "scene.hpp"
+#include "ecs_core/demo/physics.hpp"
+#include "ecs_core/demo/render_system_textured.hpp"
 
 #include <memory>
 #include <vector>
@@ -37,6 +39,10 @@ namespace te {
         std::unique_ptr<DescriptorPool> globalPool{};
         std::vector<std::unique_ptr<DescriptorPool>> framePools;
         GameObjectManager gameObjectManager{device};
+
+        std::unique_ptr<Scene> scene{};
+        std::shared_ptr<PhysicsSystem> physicsSystem{};
+        std::shared_ptr<RenderSystemTextured> renderSystemTextured{};
      };
 }
 

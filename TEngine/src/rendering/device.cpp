@@ -57,6 +57,7 @@ namespace te {
     }
 
     Device::~Device() {
+        std::cout << "Freeing device" << std::endl;
         vkDestroyCommandPool(device_, commandPool, nullptr);
         vkDestroyDevice(device_, nullptr);
 

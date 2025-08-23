@@ -7,6 +7,7 @@
 #include "entity_manager.hpp"
 
 #include <unordered_map>
+#include <iostream>
 
 namespace te {
 
@@ -14,6 +15,7 @@ namespace te {
     public:
         virtual ~IComponentArray() = default;
         virtual void entityDestroyed(Entity entity) = 0;
+        virtual size_t getSize() = 0;
     };
 
     template<typename T>
@@ -43,6 +45,8 @@ namespace te {
             mEntityToIndexMap.erase(entity);
             mIndexToEntityMap.erase(indexOfLastElement);
             --mSize;
+
+            std::cout << mSize << " components left" << std::endl;
         }
 
         T& getData(Entity entity) {
@@ -59,6 +63,10 @@ namespace te {
             if (mEntityToIndexMap.find(entity) != mEntityToIndexMap.end()) {
                 removeData(entity);
             }
+        }
+
+        size_t getSize() override {
+            return mSize;
         }
 
 
