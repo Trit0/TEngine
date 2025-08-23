@@ -6,6 +6,7 @@
 
 #include <stdexcept>
 #include <array>
+#include <iostream>
 
 namespace te {
 
@@ -15,6 +16,7 @@ namespace te {
     }
 
     Renderer::~Renderer() {
+        std::cout << "Freeing renderer" << std::endl;
         freeCommandBuffers();
     }
 

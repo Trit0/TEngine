@@ -13,6 +13,11 @@ namespace te {
 
     class SystemManager {
     public:
+        ~SystemManager() {
+            std::cout << "Freeing system manager" << std::endl;
+        }
+
+
         template<typename T>
         std::shared_ptr<T> registerSystem() {
             const char* typeName = typeid(T).name();
@@ -45,9 +50,19 @@ namespace te {
         }
 
         void entityDestroyed(Entity entity) {
+            std::vector<const char*> toDestroy{};
             for (auto const& pair : mSystems) {
                 auto const& system = pair.second;
                 system->mEntities.erase(entity);
+
+                if (system->mEntities.size() == 0) {
+                    toDestroy.push_back(pair.first);
+                }
+            }
+
+            for (auto element : toDestroy) {
+                std::cout << "Destroying " << element << std::endl;
+                mSystems.erase(element);
             }
         }
 

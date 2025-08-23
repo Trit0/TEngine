@@ -18,6 +18,7 @@ namespace te {
     }
 
     Pipeline::~Pipeline() {
+        std::cout << "Freeing pipeline" << std::endl;
         vkDestroyShaderModule(device.device(), vertShaderModule, nullptr);
         vkDestroyShaderModule(device.device(), fragShaderModule, nullptr);
         vkDestroyPipeline(device.device(), graphicsPipeline, nullptr);

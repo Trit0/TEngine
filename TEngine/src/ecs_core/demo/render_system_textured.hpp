@@ -14,6 +14,10 @@ namespace te {
 //TODO optimize that shit
     class RenderSystemTextured : public System {
     public:
+        ~RenderSystemTextured() {
+            std::cout << "Freeing render system textured" << std::endl;
+        }
+
         void render(FrameInfo & frameInfo, SimpleRenderSystem& simpleRenderSystem) {
             simpleRenderSystem.renderGameObjects(frameInfo, mEntities, map(frameInfo));
         }

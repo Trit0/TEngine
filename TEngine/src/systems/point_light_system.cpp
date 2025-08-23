@@ -12,6 +12,7 @@
 
 #include <stdexcept>
 #include <map>
+#include <iostream>
 
 namespace te {
     struct PointLightPushConstants {
@@ -27,6 +28,7 @@ namespace te {
     }
 
     PointLightSystem::~PointLightSystem() {
+        std::cout << "Freeing point light system" << std::endl;
         vkDestroyPipelineLayout(device.device(), pipelineLayout, nullptr);
     }
 

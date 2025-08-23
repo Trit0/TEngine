@@ -5,6 +5,7 @@
 #include "descriptors.hpp"
 
 #include <cassert>
+#include <iostream>
 
 namespace te {
     // *************** Descriptor Set Layout Builder *********************
@@ -101,6 +102,7 @@ namespace te {
     }
 
     DescriptorPool::~DescriptorPool() {
+        std::cout << "Freeing descriptor pool" << std::endl;
         vkDestroyDescriptorPool(device.device(), descriptorPool, nullptr);
     }
 

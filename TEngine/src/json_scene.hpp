@@ -13,6 +13,7 @@ namespace te {
     public:
         JsonScene(const std::string& filePath);
         void init(te::Device &device) override;
+        void free() override;
     private:
         std::string source;
     };

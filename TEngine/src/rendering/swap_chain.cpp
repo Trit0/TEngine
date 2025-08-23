@@ -32,6 +32,8 @@ namespace te {
     }
 
     SwapChain::~SwapChain() {
+        std::cout << "Freeing swap chain" << std::endl;
+
         for (auto imageView: swapChainImageViews) {
             vkDestroyImageView(device.device(), imageView, nullptr);
         }

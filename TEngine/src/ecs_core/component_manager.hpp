@@ -13,6 +13,10 @@ namespace te {
 
     class ComponentManager {
     public:
+        ~ComponentManager() {
+            std::cout << "Freeing component manager" << std::endl;
+        }
+
         template<typename T>
         void registerComponent() {
             const char* typeName = typeid(T).name();
@@ -56,9 +60,18 @@ namespace te {
         }
 
         void entityDestroyed(Entity entity) {
+            std::vector<const char*> toDestroy{};
             for (auto const& pair : mComponentArrays) {
                 auto const& component = pair.second;
                 component->entityDestroyed(entity);
+                if (component->getSize() == 0) {
+                    toDestroy.push_back(pair.first);
+                }
+            }
+
+            for (auto element : toDestroy) {
+                std::cout << "Destroying " << element << std::endl;
+                mComponentArrays.erase(element);
             }
         }
 

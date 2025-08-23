@@ -14,6 +14,7 @@
 
 #include <cassert>
 #include <unordered_map>
+#include <iostream>
 
 namespace std {
     template <>
@@ -33,6 +34,7 @@ namespace te {
     }
 
     Model::~Model() {
+        std::cout << "Freeing model" << std::endl;
     }
 
     std::unique_ptr<Model> Model::createModelFromFile(Device& device, const std::string& filePath) {

@@ -10,6 +10,7 @@
 #include <queue>
 #include <cassert>
 #include <array>
+#include <iostream>
 
 namespace te {
     using Entity = uint32_t;
@@ -27,6 +28,11 @@ namespace te {
                 mAvailableEntities.push(entity);
             }
         }
+
+        ~EntityManager() {
+            std::cout << "Freeing entity manager" << std::endl;
+        }
+
 
         Entity createEntity() {
             assert(mLivingEntityCount < MAX_ENTITIES && "Too many entities in existence.");

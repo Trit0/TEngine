@@ -90,6 +90,9 @@ namespace  te {
         GameObjectManager &operator=(const GameObjectManager &) = delete;
         GameObjectManager(GameObjectManager &&) = delete;
         GameObjectManager &operator=(GameObjectManager &&) = delete;
+        ~GameObjectManager() {
+            std::cout << "Freeing game object manager" << std::endl;
+        }
 
         GameObject &createGameObject() {
             assert(currentId < MAX_GAME_OBJECTS && "Max game object count exceeded!");

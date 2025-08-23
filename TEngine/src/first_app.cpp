@@ -36,10 +36,9 @@ namespace te {
     }
 
     FirstApp::~FirstApp() {
+        std::cout << "Freeing first app" << std::endl;
     }
 
-    std::shared_ptr<PhysicsSystem> physicsSystem;
-    std::shared_ptr<RenderSystemTextured> renderSystemTextured;
     SceneManager gSceneManager;
 
     void FirstApp::run() {
@@ -144,6 +143,10 @@ namespace te {
                 renderer.endFrame();
             }
         }
+        std::cout << "Window should be closing" << std::endl;
+
+        scene->free();
+        uboBuffers.clear();
 
         vkDeviceWaitIdle(device.device());
     }
@@ -217,6 +220,8 @@ namespace te {
         renderSystemTextured->init(device);
 
         scene->init(device);
+
+        this->scene = std::move(scene);
 
 //        auto scenePath = "../scenes/scene.json";
 //        simdjson::ondemand::parser parser;
