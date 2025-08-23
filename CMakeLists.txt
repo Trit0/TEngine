@@ -1,13 +1,10 @@
 cmake_minimum_required(VERSION 3.26)
-project(TEngine)
+project(TEngine VERSION 0.1.0)
 
-set(CMAKE_TOOLCHAIN_FILE include/conan_toolchain.cmake)
-set(CMAKE_BUILD_TYPE Debug)
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_CXX_STANDARD 23)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
-
+# Dependencies
 find_package(GLFW3 REQUIRED)
 find_package(GLM REQUIRED)
 find_package(Vulkan REQUIRED)
@@ -15,54 +12,81 @@ find_package(tinyobjloader REQUIRED)
 find_package(simdjson REQUIRED)
 find_package(stb REQUIRED)
 
+# Sources
+file(GLOB_RECURSE SOURCES ${PROJECT_SOURCE_DIR}/src/*.cpp)
+file(GLOB_RECURSE HEADERS ${PROJECT_SOURCE_DIR}/src/*.hpp)
+
+# Shaders
 set(SHADERS_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shaders)
 file(GLOB SHADER_FILES ${SHADERS_DIR}/*.frag ${SHADERS_DIR}/*.vert)
 
 find_package(Vulkan COMPONENTS glslc)
 find_program(glslc_executable NAMES glslc HINTS Vulkan::glslc)
 
-function(compile_shader target)
-    cmake_parse_arguments(PARSE_ARGV 1 arg "" "ENV;FORMAT" "SOURCES")
+# Include helper functions
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/CompileShaders.cmake)
 
-    file(GLOB_RECURSE compiled_shaders "${SHADERS_DIR}/*.${arg_FORMAT}")
+# Engine library
+add_library(${PROJECT_NAME} ${SOURCES} ${HEADERS})
+add_library(${PROJECT_NAME}::${PROJECT_NAME} ALIAS ${PROJECT_NAME})
 
-    foreach(compiled_shader ${compiled_shaders})
-        # Get the original source file path by removing the format extension
-        string(REGEX REPLACE "\\.${arg_FORMAT}$" "" source_file ${compiled_shader})
-
-        # Check if the corresponding source file exists
-        if (NOT EXISTS ${source_file})
-            message(STATUS "Deleting orphaned shader: ${compiled_shader}")
-            file(REMOVE ${compiled_shader})
-        endif()
-    endforeach()
-
-    foreach(source ${arg_SOURCES})
-        get_filename_component(filename ${source} NAME)
-        get_filename_component(filepath ${source} DIRECTORY)
-        set(output_file ${filepath}/${filename}.${arg_FORMAT})
-
-        string(TOUPPER ${arg_FORMAT} FORMAT_UPPER)
-
-        add_custom_command(
-                OUTPUT ${output_file}
-                COMMAND ${glslc_executable} ${source} -o ${output_file}
-                DEPENDS ${source}
-                COMMENT "Compiling ${FORMAT_UPPER} shader ${filename}.${arg_FORMAT}"
-        )
-
-        target_sources(${target} PRIVATE ${output_file})
-    endforeach()
-endfunction()
-
-message("Building with CMake version: ${CMAKE_VERSION}")
-
-add_executable(${PROJECT_NAME} ${SOURCES})
-
+# Shader compilation
 compile_shader(${PROJECT_NAME}
         FORMAT spv
         SOURCES ${SHADER_FILES}
 )
 
-target_link_libraries(${PROJECT_NAME} glfw glm::glm Vulkan::Vulkan tinyobjloader::tinyobjloader simdjson::simdjson stb::stb)
-target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src PUBLIC ${glfw3_INCLUDE_DIRS} ${glm_INCLUDE_DIRS} ${tinyobjloader_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PUBLIC
+        glfw
+        glm::glm
+        Vulkan::Vulkan
+        tinyobjloader::tinyobjloader
+        simdjson::simdjson
+        stb::stb
+)
+
+target_include_directories(${PROJECT_NAME} PUBLIC
+        $<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/src>
+        $<INSTALL_INTERFACE:include>
+)
+
+# ---------- INSTALL RULES ----------
+include(GNUInstallDirs)
+
+install(TARGETS ${PROJECT_NAME}
+        EXPORT ${PROJECT_NAME}Targets
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+        RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(DIRECTORY include/
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+        FILES_MATCHING PATTERN "*.hpp"
+)
+#install(DIRECTORY include/ DESTINATION include)
+
+install(EXPORT ${PROJECT_NAME}Targets
+        FILE ${PROJECT_NAME}Targets.cmake
+        NAMESPACE ${PROJECT_NAME}::
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+include(CMakePackageConfigHelpers)
+write_basic_package_version_file(
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        VERSION ${PROJECT_VERSION}
+        COMPATIBILITY SameMajorVersion
+)
+
+configure_package_config_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/${PROJECT_NAME}Config.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)
+
+install(FILES
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake"
+        "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake"
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}
+)

@@ -3,7 +3,8 @@
 //
 
 #include "model.hpp"
-
+#include "rendering/device.hpp"
+#include "rendering/buffer.hpp"
 #include "utils.hpp"
 
 #define TINYOBJLOADER_IMPLEMENTATION

@@ -5,7 +5,7 @@
 #pragma once
 
 #include "ecs_core/scene_manager.hpp"
-#include "device.hpp"
+#include "rendering/device.hpp"
 
 #include <string>
 

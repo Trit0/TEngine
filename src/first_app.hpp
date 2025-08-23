@@ -4,10 +4,10 @@
 
 #pragma once
 
-#include "window.hpp"
+#include "rendering/window.hpp"
 #include "game_object.hpp"
-#include "renderer.hpp"
-#include "descriptors.hpp"
+#include "rendering/renderer.hpp"
+#include "rendering/descriptors.hpp"
 #include "scene.hpp"
 
 #include <memory>

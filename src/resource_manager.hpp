@@ -5,7 +5,7 @@
 #pragma once
 
 #include "model.hpp"
-#include "texture.hpp"
+#include "rendering/texture.hpp"
 
 #include <unordered_map>
 #include <string>

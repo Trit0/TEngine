@@ -5,8 +5,8 @@
 #pragma once
 
 #include "model.hpp"
-#include "texture.hpp"
-#include "swap_chain.hpp"
+#include "rendering/texture.hpp"
+#include "rendering/swap_chain.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <simdjson.h>

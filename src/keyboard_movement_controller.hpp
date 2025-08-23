@@ -5,7 +5,7 @@
 #pragma once
 
 #include "game_object.hpp"
-#include "window.hpp"
+#include "rendering/window.hpp"
 
 namespace te {
     class KeyboardMovementController {

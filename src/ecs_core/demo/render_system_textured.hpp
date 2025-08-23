@@ -5,7 +5,7 @@
 #pragma once
 
 #include "../system.hpp"
-#include "frame_info.hpp"
+#include "rendering/frame_info.hpp"
 #include "systems/simple_render_system.hpp"
 
 #include <numeric>

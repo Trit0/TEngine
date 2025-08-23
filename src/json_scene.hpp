@@ -4,6 +4,7 @@
 
 #pragma once
 
+#include "rendering/device.hpp"
 #include "scene.hpp"
 
 namespace te {

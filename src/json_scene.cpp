@@ -7,7 +7,7 @@
 #include "resource_manager.hpp"
 #include "game_object.hpp"
 #include "ecs_core/demo/physics.hpp"
-#include "device.hpp"
+#include "rendering/device.hpp"
 
 #include <simdjson.h>
 

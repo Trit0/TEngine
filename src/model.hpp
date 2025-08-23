@@ -4,8 +4,8 @@
 
 #pragma once
 
-#include "device.hpp"
-#include "buffer.hpp"
+#include "rendering/device.hpp"
+#include "rendering/buffer.hpp"
 
 // libs
 #define GLM_FORCE_RADIANS

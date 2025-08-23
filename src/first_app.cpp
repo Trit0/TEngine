@@ -4,11 +4,11 @@
 #include "systems/simple_render_system.hpp"
 #include "systems/point_light_system.hpp"
 #include "keyboard_movement_controller.hpp"
-#include "buffer.hpp"
+#include "rendering/buffer.hpp"
 #include "ecs_core/scene_manager.hpp"
 #include "ecs_core/demo/physics.hpp"
 #include "resource_manager.hpp"
-#include "texture.hpp"
+#include "rendering/texture.hpp"
 #include "ecs_core/demo/render_system_textured.hpp"
 
 #include <chrono>
@@ -122,7 +122,8 @@ namespace te {
                 uboBuffers[frameIndex]->flush();
 
                 physicsSystem->update(frameTime);
-                std::cout << "Frame time: " << frameTime << std::endl;
+                //std::cout << "Frame time: " << frameTime << std::endl;
+                std::cout << "FPS: " << 1 / frameTime << std::endl;
 
                 // final step of updateBuffers is updating the game objects buffer data
                 // The render functions MUST not change a game objects transform data

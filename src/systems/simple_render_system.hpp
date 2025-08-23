@@ -4,9 +4,9 @@
 
 #pragma once
 
-#include "pipeline.hpp"
+#include "rendering/pipeline.hpp"
 #include "game_object.hpp"
-#include "frame_info.hpp"
+#include "rendering/frame_info.hpp"
 #include "ecs_core/system.hpp"
 
 #include <vector>
